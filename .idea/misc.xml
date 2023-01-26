@@ -3,16 +3,18 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/docs/Formation/P9/RealEstateManager/app/src/main/res/layout/activity_details.xml" value="0.23489583333333333" />
+        <entry key="..\:/docs/Formation/P9/RealEstateManager/app/src/main/res/layout/activity_details.xml" value="0.1" />
         <entry key="..\:/docs/Formation/P9/RealEstateManager/app/src/main/res/layout/activity_main.xml" value="0.13142361111111112" />
+        <entry key="..\:/docs/Formation/P9/RealEstateManager/app/src/main/res/layout/activity_main_old.xml" value="0.1" />
         <entry key="..\:/docs/Formation/P9/RealEstateManager/app/src/main/res/layout/activity_second.xml" value="0.2" />
+        <entry key="..\:/docs/Formation/P9/RealEstateManager/app/src/main/res/layout/media_list_item.xml" value="0.18740849194729137" />
         <entry key="..\:/docs/Formation/P9/RealEstateManager/app/src/main/res/layout/real_estate_list_item.xml" value="0.22083333333333333" />
       </map>
     </option>
   </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
-    <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />
+    <option name="myDefaultNotNull" value="androidx.annotation.NonNull" />
     <option name="myNullables">
       <value>
         <list size="12">

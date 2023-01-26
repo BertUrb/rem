@@ -14,13 +14,17 @@
         android:layout_weight="1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
-    <LinearLayout
-        android:id="@+id/detailViewContainer"
+    <ScrollView
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="3">
+    <LinearLayout
+        android:id="@+id/detailViewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:visibility="gone"
-        android:layout_weight="3"
         android:orientation="vertical" >
     </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
