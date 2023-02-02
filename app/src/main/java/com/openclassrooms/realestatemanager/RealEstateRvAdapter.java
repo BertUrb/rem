@@ -42,7 +42,7 @@ public class RealEstateRvAdapter extends RecyclerView.Adapter<RealEstateViewHold
         holder.getRealEstatePrice().setText(mRealEstateList.get(position).getPrice() + " €");
 
         Glide.with(mContext)
-                .load(mRealEstateList.get(position).getMediaList().get(mRealEstateList.get(position).getFeaturedMediaIndex()).getMediaUrl())
+                .load(mRealEstateList.get(position).getFeaturedMediaUrl())
                 .into(holder.getRealEstateImageView());
 
         holder.itemView.setOnClickListener(v -> {

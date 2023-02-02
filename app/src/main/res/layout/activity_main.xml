@@ -15,16 +15,16 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
     <ScrollView
+        android:id="@+id/detailViewContainer"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="3">
-    <LinearLayout
-        android:id="@+id/detailViewContainer"
+        android:layout_weight="2">
+    <FrameLayout
+        android:id="@+id/FragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
+        android:layout_height="match_parent"
         android:orientation="vertical" >
-    </LinearLayout>
+    </FrameLayout>
     </ScrollView>
 
 </LinearLayout>
