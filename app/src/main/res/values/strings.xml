@@ -9,4 +9,20 @@
     <string name="number_of_rooms">Number of rooms : %s</string>
     <string name="number_of_bathrooms">Number of bathrooms: %s</string>
     <string name="address">Address: %s</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="login">Login</string>
+    <string name="password">password</string>
+    <string name="edit_button">Edit</string>
+    <string name="new_button">New</string>
+    <string name="sell_button">Mark as Sold</string>
+    <string name="search_button">Search</string>
+    <string name="save">Save</string>
 </resources>

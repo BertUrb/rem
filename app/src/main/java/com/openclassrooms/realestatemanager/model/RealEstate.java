@@ -47,7 +47,8 @@ public class RealEstate implements Parcelable {
         mFeaturedMediaUrl = featuredMediaUrl;
     }
 
-    public RealEstate(long mID, String name, String region, int price, List<RealEstateMedia> mediaList, String featuredMediaUrl) {
+    @Ignore
+    public RealEstate(long mID, String name, String region, int price, String featuredMediaUrl) {
         this.mID = mID;
         mName = name;
         mRegion = region;

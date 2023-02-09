@@ -4,7 +4,9 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:background="@drawable/item_background_selector"
+    >
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/real_estate_list_rv"
@@ -22,7 +24,7 @@
     <FrameLayout
         android:id="@+id/FragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical" >
     </FrameLayout>
     </ScrollView>

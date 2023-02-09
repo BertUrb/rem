@@ -27,6 +27,7 @@ public class SupportActivity extends AppCompatActivity {
         fragment.setArguments(bundle);
 
         transaction.replace(binder.SupportFrame.getId(), fragment);
+        getSupportActionBar().setTitle(realEstate.getName());
         transaction.commit();
 
     }

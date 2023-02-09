@@ -1,15 +1,20 @@
 package com.openclassrooms.realestatemanager.ui;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateRvAdapter;
 import com.openclassrooms.realestatemanager.Utils;
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding;
@@ -25,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding mBinding;
     private RealEstateViewModel mRealEstateViewModel;
     private List<RealEstate> mEstates = new ArrayList<>();
+
+    private int selectedPosition = -1;
+
 
 
 
@@ -46,10 +54,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     private void updateEstates() {
         OnRealEstateClickListener onRealEstateClickListener = position -> {
             RealEstate realEstate = mEstates.get(position);
+             selectedPosition = position;
+
 
             if(mBinding.detailViewContainer.getVisibility() == View.VISIBLE) {
                 Bundle bundle = new Bundle();
@@ -58,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 DetailsFragment fragment = new DetailsFragment();
                 fragment.setArguments(bundle);
+                getSupportActionBar().setTitle(realEstate.getName());
+
+
+
+
 
                 transaction.replace(mBinding.FragmentContainer.getId(), fragment);
                 transaction.commit();
@@ -72,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             Toast.makeText(getApplicationContext(),"position:" + position,Toast.LENGTH_SHORT).show();
+
 
         };
         mBinding.realEstateListRv.setAdapter(new RealEstateRvAdapter(mEstates, onRealEstateClickListener));

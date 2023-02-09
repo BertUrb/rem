@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -19,6 +20,9 @@ public class RealEstateRvAdapter extends RecyclerView.Adapter<RealEstateViewHold
     private List<RealEstate> mRealEstateList;
     private RealEstateListItemBinding mRealEstateListItemBinding;
     private final OnRealEstateClickListener mOnRealEstateClickListener;
+
+    private int selectedPosition = -1;
+
     Context mContext;
 
     public RealEstateRvAdapter(List<RealEstate> realEstateList, OnRealEstateClickListener onRealEstateClickListener)
@@ -41,12 +45,19 @@ public class RealEstateRvAdapter extends RecyclerView.Adapter<RealEstateViewHold
         holder.getRealEstateRegion().setText(mRealEstateList.get(position).getRegion());
         holder.getRealEstatePrice().setText(mRealEstateList.get(position).getPrice() + " €");
 
+        holder.itemView.setSelected(selectedPosition == position);
+        holder.itemView.setBackground(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.item_background_selector));
+
         Glide.with(mContext)
                 .load(mRealEstateList.get(position).getFeaturedMediaUrl())
                 .into(holder.getRealEstateImageView());
 
         holder.itemView.setOnClickListener(v -> {
+            notifyItemChanged(selectedPosition);
+            selectedPosition = position;
             mOnRealEstateClickListener.OnRealEstateClick(position);
+            notifyItemChanged(position);
+
         });
 
 
