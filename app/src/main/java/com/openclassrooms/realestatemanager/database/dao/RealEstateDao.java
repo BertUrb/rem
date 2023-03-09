@@ -17,7 +17,7 @@ public interface RealEstateDao {
     LiveData<List<RealEstate>> getAllRealEstate();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long createRealEstate(RealEstate realEstate);
+    long createOrUpdateRealEstate(RealEstate realEstate);
 
     @Delete
     int deleteRealEstate(RealEstate realEstate);

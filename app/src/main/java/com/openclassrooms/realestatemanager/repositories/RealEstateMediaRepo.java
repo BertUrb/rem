@@ -16,13 +16,19 @@ public class RealEstateMediaRepo {
 
     }
 
-    public LiveData<List<RealEstateMedia>> getRealEstateMediaByMediaId(long mediaId) {
-        return mRealEstateMediaDao.getMediaByRealEstateId(mediaId);
+    public LiveData<List<RealEstateMedia>> getRealEstateMediaByRealEstateId(long realEstateId) {
+        return mRealEstateMediaDao.getMediaByRealEstateId(realEstateId);
     }
 
     public long addRealEstateMedia(RealEstateMedia media) {
         return mRealEstateMediaDao.addMedia(media);
     }
+
+    public int deleteAllMediaByRealEstateID(long realEstateId) {
+        return mRealEstateMediaDao.deleteAllMediaByRealEstateId(realEstateId);
+    }
+
+
 
 
 }

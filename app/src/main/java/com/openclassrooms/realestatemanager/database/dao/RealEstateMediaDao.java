@@ -21,4 +21,7 @@ public interface RealEstateMediaDao {
     @Delete
     int deleteMedia(RealEstateMedia realEstateMedia);
 
+    @Query("DELETE FROM RealEstateMedia WHERE mRealEstateId = :realEstateID")
+    int deleteAllMediaByRealEstateId(long realEstateID);
+
 }

@@ -27,6 +27,15 @@ public class RealEstateViewModel extends ViewModel {
     }
 
     public LiveData<List<RealEstateMedia>> getRealEstateMediasByID(long id) {
-        return mRealEstateMediaRepo.getRealEstateMediaByMediaId(id);
+        return mRealEstateMediaRepo.getRealEstateMediaByRealEstateId(id);
+    }
+
+    public void createOrUpdateRealEstate(RealEstate estate) {
+        mExecutor.execute(() -> mRealEstateRepo.createOrUpdateRealEstate(estate) );
+        mExecutor.execute(() -> mRealEstateMediaRepo.deleteAllMediaByRealEstateID(estate.getID()));
+        for (RealEstateMedia media : estate.getMediaList()) {
+            media.setRealEstateId(estate.getID());
+            mExecutor.execute(() -> mRealEstateMediaRepo.addRealEstateMedia(media));
+        }
     }
 }

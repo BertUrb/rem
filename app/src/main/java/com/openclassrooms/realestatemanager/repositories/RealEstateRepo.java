@@ -17,4 +17,8 @@ public class RealEstateRepo {
     public LiveData<List<RealEstate>> getAllRealEstates() {
         return mRealEstateDao.getAllRealEstate();
     }
+
+    public long createOrUpdateRealEstate(RealEstate estate) {
+        return mRealEstateDao.createOrUpdateRealEstate(estate);
+    }
 }

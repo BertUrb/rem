@@ -47,7 +47,7 @@ public abstract  class SaveRealEstateDB extends RoomDatabase {
                 RealEstate[] realEstateList = RealEstate.getDataExample();
                 for (RealEstate realEstate: realEstateList) {
                     Executors.newSingleThreadExecutor().execute(
-                            () -> INSTANCE.realEstateDao().createRealEstate(realEstate)
+                            () -> INSTANCE.realEstateDao().createOrUpdateRealEstate(realEstate)
                     );
                 }
                 RealEstateMedia[] realEstateMedias = RealEstateMedia.getMediaExamples();

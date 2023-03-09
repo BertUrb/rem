@@ -47,6 +47,7 @@ public class RealEstate implements Parcelable {
         mFeaturedMediaUrl = featuredMediaUrl;
     }
 
+
     @Ignore
     public RealEstate(long mID, String name, String region, int price, String featuredMediaUrl) {
         this.mID = mID;
@@ -54,6 +55,20 @@ public class RealEstate implements Parcelable {
         mRegion = region;
         mPrice = price;
         mFeaturedMediaUrl = featuredMediaUrl;
+    }
+
+    public RealEstate(String name, String region, String location, String description, String featuredMediaUrl, int price, int surface, int rooms, int bathrooms, int bedrooms, List<RealEstateMedia> mediaList) {
+        mName = name;
+        mRegion = region;
+        mLocation = location;
+        mDescription = description;
+        mFeaturedMediaUrl = featuredMediaUrl;
+        mPrice = price;
+        mSurface = surface;
+        mRooms = rooms;
+        mBathrooms = bathrooms;
+        mBedrooms = bedrooms;
+        mMediaList = mediaList;
     }
 
     protected RealEstate(Parcel in) {
@@ -191,8 +206,8 @@ public class RealEstate implements Parcelable {
         return mPrice;
     }
 
-    public void setPrice(int price) {
-        mPrice = price;
+    public void setPrice(int priceInDollar) {
+        mPrice = priceInDollar;
     }
 
     @Override

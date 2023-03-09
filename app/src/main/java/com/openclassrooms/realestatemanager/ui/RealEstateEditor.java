@@ -2,7 +2,7 @@ package com.openclassrooms.realestatemanager.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,6 +19,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.openclassrooms.realestatemanager.databinding.ActivityRealEstateEditorBinding;
+import com.openclassrooms.realestatemanager.event.EditTextFocusListener;
+import com.openclassrooms.realestatemanager.model.RealEstate;
+import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,14 +30,17 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 public class RealEstateEditor extends AppCompatActivity {
     private static final int REQUEST_CODE_PICK_IMAGES = 1;
     private static final int REQUEST_IMAGE_CAPTURE=2,
                             REQUEST_PERMISSION_CODE =3;
-    private List<Uri> mSelectedImagesUri = new ArrayList<>();
+    private List<RealEstateMedia> mRealEstateMedias = new ArrayList<>();
 
     ActivityRealEstateEditorBinding mBinding;
+    RealEstate mRealEstate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,11 +49,74 @@ public class RealEstateEditor extends AppCompatActivity {
         mBinding = ActivityRealEstateEditorBinding.inflate(getLayoutInflater());
         mBinding.ivPhoto.setOnClickListener(view -> checkPermissions());
         setContentView(mBinding.getRoot());
+
+        mBinding.etBathrooms.setOnFocusChangeListener(new EditTextFocusListener());
+        mBinding.etPrice.setOnFocusChangeListener(new EditTextFocusListener());
+        mBinding.etLocation.setOnFocusChangeListener(new EditTextFocusListener());
+        mBinding.etSurface.setOnFocusChangeListener(new EditTextFocusListener());
+        mBinding.etRooms.setOnFocusChangeListener(new EditTextFocusListener());
+        mBinding.etBedrooms.setOnFocusChangeListener(new EditTextFocusListener());
+        mBinding.etName.setOnFocusChangeListener(new EditTextFocusListener());
+        mBinding.etRegion.setOnFocusChangeListener(new EditTextFocusListener());
+
+
+        mRealEstate = getIntent().getParcelableExtra("REAL_ESTATE");
+        if(mRealEstate != null) {
+            mBinding.etBathrooms.setText(String.format(Locale.getDefault(),"%d",mRealEstate.getBathrooms()));
+            mBinding.etBedrooms.setText(String.format(Locale.getDefault(),"%d",mRealEstate.getBedrooms()));
+            mBinding.etRooms.setText(String.format(Locale.getDefault(),"%d",mRealEstate.getRooms()));
+            mBinding.etName.setText(mRealEstate.getName());
+            mBinding.etRegion.setText(mRealEstate.getRegion());
+            mBinding.textInputEditTextDescription.setText(mRealEstate.getDescription());
+            mRealEstateMedias = mRealEstate.getMediaList();
+            mBinding.rvSelectedPhotos.setAdapter(new RealEstateEditorRvAdapter(mRealEstateMedias));
+            mBinding.etSurface.setText(String.format(Locale.getDefault(),"%d",mRealEstate.getSurface()));
+            mBinding.etLocation.setText(mRealEstate.getLocation());
+            mBinding.etPrice.setText(String.format(Locale.getDefault(),"%d",mRealEstate.getPrice()));
+        }
+        mBinding.btSave.setOnClickListener(view -> {
+
+            for (RealEstateMedia media : mRealEstateMedias) {
+                int index = mRealEstateMedias.indexOf(media);
+                if (index >= 0 && index < mBinding.rvSelectedPhotos.getChildCount()) {
+                    media.setMediaCaption(((RealEstateEditorRvViewHolder) Objects.requireNonNull(mBinding.rvSelectedPhotos.findViewHolderForAdapterPosition(index))).getCaption().getText().toString());
+                }
+            }
+            RealEstate realEstate = new RealEstate(mBinding.etName.getText().toString(),
+                        mBinding.etRegion.getText().toString(),
+                        mBinding.etLocation.getText().toString(),
+                        Objects.requireNonNull(mBinding.textInputEditTextDescription.getText()).toString(),
+                        mRealEstateMedias.get(0).getMediaUrl(),
+                        Integer.parseInt(mBinding.etPrice.getText().toString()),
+                        Integer.parseInt(mBinding.etSurface.getText().toString()),
+                        Integer.parseInt(mBinding.etRooms.getText().toString()),
+                        Integer.parseInt(mBinding.etBathrooms.getText().toString()),
+                        Integer.parseInt(mBinding.etBedrooms.getText().toString()),
+                        mRealEstateMedias);
+
+                if(mRealEstate != null) {
+                    realEstate.setID(mRealEstate.getID());
+                }
+
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("EDITED_REAL_ESTATE", realEstate);
+            setResult(Activity.RESULT_OK, resultIntent);
+            finish();
+
+
+
+
+        });
+
+
+
+
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSION_CODE) {// If request is cancelled, the result arrays are empty.
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -94,12 +163,26 @@ public class RealEstateEditor extends AppCompatActivity {
                 if (data.getClipData() != null) {
                     int count = data.getClipData().getItemCount();
                     for (int i = 0; i < count; i++) {
+                        RealEstateMedia media;
                         Uri imageUri = data.getClipData().getItemAt(i).getUri();
-                        mSelectedImagesUri.add(imageUri);
+                        if(mRealEstate == null) {
+                            media = new RealEstateMedia(imageUri.toString(),"");
+                        }
+                        else {
+                            media = new RealEstateMedia(mRealEstate.getID(), imageUri.toString(), "");
+                        }
+                        mRealEstateMedias.add(media);
                     }
                 } else {
+                    RealEstateMedia media;
                     Uri imageUri = data.getData();
-                    mSelectedImagesUri.add(imageUri);
+                    if(mRealEstate == null) {
+                        media = new RealEstateMedia(imageUri.toString(),"");
+                    }
+                    else {
+                        media = new RealEstateMedia(mRealEstate.getID(), imageUri.toString(), "");
+                    }
+                    mRealEstateMedias.add(media);
                 }
 
 
@@ -112,7 +195,7 @@ public class RealEstateEditor extends AppCompatActivity {
             saveImageToGallery(imageBitmap);
 
         }
-        mBinding.rvSelectedPhotos.setAdapter(new RealEstateEditorRvAdapter(mSelectedImagesUri));
+        mBinding.rvSelectedPhotos.setAdapter(new RealEstateEditorRvAdapter(mRealEstateMedias));
     }
     private void saveImageToGallery(Bitmap bitmap) {
         @SuppressLint("SimpleDateFormat") String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -128,7 +211,7 @@ public class RealEstateEditor extends AppCompatActivity {
             // Add the image to the gallery so it is accessible from other apps
             Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             Uri contentUri = Uri.fromFile(file);
-            mSelectedImagesUri.add(contentUri);
+            mRealEstateMedias.add(new RealEstateMedia(mRealEstate.getID(),contentUri.toString(),""));
 
             mediaScanIntent.setData(contentUri);
             sendBroadcast(mediaScanIntent);

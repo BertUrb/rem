@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(foreignKeys = @ForeignKey(entity = RealEstate.class,parentColumns = "mID",childColumns = "mRealEstateId"))
@@ -20,6 +21,18 @@ public class RealEstateMedia implements Parcelable {
 
     public RealEstateMedia(long mID,long realEstateId, @NonNull String mediaUrl, @NonNull String mediaCaption) {
         this.mID = mID;
+        mRealEstateId = realEstateId;
+        mMediaUrl = mediaUrl;
+        mMediaCaption = mediaCaption;
+    }
+
+    @Ignore
+    public RealEstateMedia(@NonNull String mediaUrl, @NonNull String mediaCaption) {
+        mMediaUrl = mediaUrl;
+        mMediaCaption = mediaCaption;
+    }
+    @Ignore
+    public RealEstateMedia(long realEstateId, @NonNull String mediaUrl, @NonNull String mediaCaption) {
         mRealEstateId = realEstateId;
         mMediaUrl = mediaUrl;
         mMediaCaption = mediaCaption;

@@ -3,7 +3,6 @@ package com.openclassrooms.realestatemanager.ui;
 import android.content.Context;
 import android.net.Uri;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -11,16 +10,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.openclassrooms.realestatemanager.databinding.AddMediaListItemBinding;
+import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 
 import java.util.List;
 
 public class RealEstateEditorRvAdapter extends RecyclerView.Adapter<RealEstateEditorRvViewHolder> {
-    List<Uri> mSelectedMediaUriList;
+    List<RealEstateMedia> mRealEstateMediaList;
     private AddMediaListItemBinding mMediaListItemBinding;
     private Context mContext;
 
-    public RealEstateEditorRvAdapter(List<Uri> selectedMediaUriList) {
-        mSelectedMediaUriList = selectedMediaUriList;
+    public RealEstateEditorRvAdapter(List<RealEstateMedia> realEstateMediaList) {
+        mRealEstateMediaList = realEstateMediaList;
     }
 
     @NonNull
@@ -34,19 +34,23 @@ public class RealEstateEditorRvAdapter extends RecyclerView.Adapter<RealEstateEd
     @Override
     public void onBindViewHolder(@NonNull RealEstateEditorRvViewHolder holder, int position) {
         Glide.with(mContext)
-                .load(mSelectedMediaUriList.get(position))
+                .load(mRealEstateMediaList.get(position).getMediaUrl())
                 .into(holder.getImage());
 
+        holder.getCaption().setText(mRealEstateMediaList.get(position).getMediaCaption());
+
         holder.getButton().setOnClickListener(view -> {
-            if (position < mSelectedMediaUriList.size()) {
-                mSelectedMediaUriList.remove(position);
+            if (position < mRealEstateMediaList.size()) {
+                mRealEstateMediaList.remove(position);
                 notifyItemRemoved(position);
             }
         });
     }
 
+
+
     @Override
     public int getItemCount() {
-        return mSelectedMediaUriList.size();
+        return mRealEstateMediaList.size();
     }
 }
