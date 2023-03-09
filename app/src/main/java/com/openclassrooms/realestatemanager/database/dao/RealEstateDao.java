@@ -1,5 +1,7 @@
 package com.openclassrooms.realestatemanager.database.dao;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -21,6 +23,9 @@ public interface RealEstateDao {
 
     @Delete
     int deleteRealEstate(RealEstate realEstate);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertMultipleRealEstates(List<RealEstate> realEstates) ;
 
 
 

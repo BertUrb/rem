@@ -18,6 +18,9 @@ public interface RealEstateMediaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long addMedia(RealEstateMedia realEstateMedia);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertMultipleMedia(List<RealEstateMedia> realEstateMediaList);
+
     @Delete
     int deleteMedia(RealEstateMedia realEstateMedia);
 

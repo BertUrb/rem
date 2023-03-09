@@ -49,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private void getEstatesObserver(List<RealEstate> estates) {
         mEstates.clear();
         mEstates.addAll(estates);
-        updateEstates();
+        if(estates.size()>0)
+            updateEstates();
 
     }
 

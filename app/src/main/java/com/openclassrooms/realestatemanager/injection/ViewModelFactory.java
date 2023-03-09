@@ -23,7 +23,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     private ViewModelFactory(Context context) {
         SaveRealEstateDB db = SaveRealEstateDB.getInstance(context);
         mRealEstateRepo = new RealEstateRepo(db.realEstateDao());
-        mRealEstateMediaRepo = new RealEstateMediaRepo(db.ralEstateMediaDao());
+        mRealEstateMediaRepo = new RealEstateMediaRepo(db.realEstateMediaDao());
         mExecutor = Executors.newSingleThreadExecutor();
     }
 

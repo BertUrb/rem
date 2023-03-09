@@ -9,6 +9,9 @@ import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity(foreignKeys = @ForeignKey(entity = RealEstate.class,parentColumns = "mID",childColumns = "mRealEstateId"))
 public class RealEstateMedia implements Parcelable {
     @NonNull
@@ -89,21 +92,22 @@ public class RealEstateMedia implements Parcelable {
         mMediaCaption = mediaCaption;
     }
 
-    public static RealEstateMedia[] getMediaExamples() {
-        return new RealEstateMedia[] {
+    public static List<RealEstateMedia> getMediaExamples() {
+        List<RealEstateMedia> medias =  new ArrayList<>();
 
-        new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-1.jpg","Whole house"),
-        new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-13.jpg","Play Room"),
-        new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-16.jpg","Library"),
-        new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-24.jpg","Bedroom"),
-        new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A5194.jpg","Outside"),
-        new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A3878.jpg","Inside 1"),
-        new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A3930.jpg","Inside 2"),
-        new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A4070.jpg","Inside 3"),
-        new RealEstateMedia(0,3,"https://aaronkirman.com/wp-content/uploads/2022/01/DJI_0648.jpg","Outside"),
-        new RealEstateMedia(0,3,"https://aaronkirman.com/wp-content/uploads/2022/01/163A0232.jpg","Inside 1"),
-        new RealEstateMedia(0,3,"https://aaronkirman.com/wp-content/uploads/2022/01/163A0320.jpg","Inside 2")
-        };
+        medias.add(new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-1.jpg","Whole house"));
+        medias.add(new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-13.jpg","Play Room"));
+        medias.add(new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-16.jpg","Library"));
+        medias.add(new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-24.jpg","Bedroom"));
+        medias.add(new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A5194.jpg","Outside"));
+        medias.add(new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A3878.jpg","Inside 1"));
+        medias.add(new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A3930.jpg","Inside 2"));
+        medias.add(new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A4070.jpg","Inside 3"));
+        medias.add(new RealEstateMedia(0,3,"https://aaronkirman.com/wp-content/uploads/2022/01/DJI_0648.jpg","Outside"));
+        medias.add(new RealEstateMedia(0,3,"https://aaronkirman.com/wp-content/uploads/2022/01/163A0232.jpg","Inside 1"));
+        medias.add(new RealEstateMedia(0,3,"https://aaronkirman.com/wp-content/uploads/2022/01/163A0320.jpg","Inside 2"));
+
+        return medias;
     }
 
     @Override

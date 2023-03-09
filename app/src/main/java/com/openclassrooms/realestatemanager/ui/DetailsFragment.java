@@ -46,6 +46,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class DetailsFragment extends Fragment {
@@ -71,7 +72,7 @@ public class DetailsFragment extends Fragment {
         public void onResult(@NonNull SearchSuggestion suggestion, @NonNull SearchResult result, @NonNull ResponseInfo info) {
             Point centerPoint = result.getCoordinate();
             MapboxStaticMap staticMap = MapboxStaticMap.builder()
-                    .accessToken(getString(R.string.mapbox_access_token))
+                    .accessToken(requireActivity().getString(R.string.mapbox_access_token))
                     .styleId(StaticMapCriteria.STREET_STYLE)
                     .cameraPoint(centerPoint)
                     .cameraZoom(16)
