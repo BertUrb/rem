@@ -38,4 +38,5 @@ public class RealEstateViewModel extends ViewModel {
             mExecutor.execute(() -> mRealEstateMediaRepo.addRealEstateMedia(media));
         }
     }
+
 }

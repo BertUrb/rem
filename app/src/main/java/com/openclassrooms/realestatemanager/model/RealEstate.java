@@ -4,32 +4,59 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
 public class RealEstate implements Parcelable {
 
+    public static final Creator<RealEstate> CREATOR = new Creator<RealEstate>() {
+        @Override
+        public RealEstate createFromParcel(Parcel in) {
+            return new RealEstate(in);
+        }
+
+        @Override
+        public RealEstate[] newArray(int size) {
+            return new RealEstate[size];
+        }
+    };
+    @ColumnInfo(name = "listing_date")
+    Date mListingDate;
+    @ColumnInfo(name = "sale_date")
+    Date       mSaleDate;
     @PrimaryKey(autoGenerate = true)
     private long mID;
+    private String mName;
+    private String mRegion;
+    private String mLocation;
+    private String mDescription;
+    private String mFeaturedMediaUrl;
 
+    public void setListingDate(Date listingDate) {
+        mListingDate = listingDate;
+    }
 
+    public String getAgentName() {
+        return mAgentName;
+    }
 
-    private String mName,
-            mRegion,
-            mLocation,
-            mDescription,
-            mFeaturedMediaUrl;
+    public void setAgentName(String agentName) {
+        mAgentName = agentName;
+    }
+
+    private String mAgentName;
     private int mPrice,
             mSurface,
             mRooms,
             mBathrooms,
             mBedrooms;
-
     @Ignore
     private List<RealEstateMedia> mMediaList;
 
@@ -45,8 +72,9 @@ public class RealEstate implements Parcelable {
         mBathrooms = bathrooms;
         mBedrooms = bedrooms;
         mFeaturedMediaUrl = featuredMediaUrl;
+        mListingDate = new Date();
+        mAgentName = "temporaire: sera remplacé par l'user firebase";
     }
-
 
     @Ignore
     public RealEstate(long mID, String name, String region, int price, String featuredMediaUrl) {
@@ -86,18 +114,6 @@ public class RealEstate implements Parcelable {
         mMediaList = in.createTypedArrayList(RealEstateMedia.CREATOR);
     }
 
-    public static final Creator<RealEstate> CREATOR = new Creator<RealEstate>() {
-        @Override
-        public RealEstate createFromParcel(Parcel in) {
-            return new RealEstate(in);
-        }
-
-        @Override
-        public RealEstate[] newArray(int size) {
-            return new RealEstate[size];
-        }
-    };
-
     public static List<RealEstate> getDataExample() {
 
         List<RealEstate> estates = new ArrayList<>();
@@ -113,6 +129,18 @@ public class RealEstate implements Parcelable {
 
         return estates;
 
+    }
+
+    public Date getListingDate() {
+        return mListingDate;
+    }
+
+    public Date getSaleDate() {
+        return mSaleDate;
+    }
+
+    public void setSaleDate(Date saleDate) {
+        mSaleDate = saleDate;
     }
 
     public String getDescription() {

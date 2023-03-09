@@ -1,6 +1,7 @@
 package com.openclassrooms.realestatemanager.ui;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -45,6 +47,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -55,9 +59,6 @@ public class DetailsFragment extends Fragment {
     private AsyncOperationTask searchRequestTask;
 
     private final SearchSelectionCallback searchCallback = new SearchSelectionCallback() {
-
-
-
         @Override
         public void onSuggestions(@NonNull List<SearchSuggestion> suggestions, @NonNull ResponseInfo responseInfo) {
             if (suggestions.isEmpty()) {
@@ -126,7 +127,16 @@ public class DetailsFragment extends Fragment {
                 break;
 
             case 3 : //sell
-                //TODO
+                Calendar cal = Calendar.getInstance();
+                DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        cal.set(year,month, dayOfMonth);
+                        mEstate.setSaleDate(cal.getTime());
+                        mRealEstateViewModel.createOrUpdateRealEstate(mEstate);
+                    }
+                }, cal.get(Calendar.YEAR),cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+                datePickerDialog.show();
                 break;
             case 4 : //search
                 //todo

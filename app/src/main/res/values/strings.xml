@@ -26,5 +26,6 @@
     <string name="sell_button">Mark as Sold</string>
     <string name="search_button">Search</string>
     <string name="save">Save</string>
+    <string name="sold">Sold : %s</string>
     <string name="mapbox_access_token">pk.eyJ1IjoiYmVydHVyYiIsImEiOiJjbGVyYXJ6eW8wdWxkM3dvN3VuMHQ5ZTdkIn0.b9eegw5snL9pJ4KH-8jlWg</string>
 </resources>

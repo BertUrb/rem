@@ -2,6 +2,8 @@ package com.openclassrooms.realestatemanager.ui;
 
 import android.app.Application;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +26,7 @@ import com.openclassrooms.realestatemanager.model.RealEstate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -68,7 +71,14 @@ public class MainActivity extends AppCompatActivity {
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 DetailsFragment fragment = new DetailsFragment();
                 fragment.setArguments(bundle);
-                getSupportActionBar().setTitle(realEstate.getName());
+                int color = Color.BLUE;
+                String title = realEstate.getName();
+                if(realEstate.getSaleDate() != null) {
+                    color =  Color.RED;
+                    title += " " + getString(R.string.sold, realEstate.getSaleDate());
+                }
+                Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(color));
+                getSupportActionBar().setTitle(title);
 
 
 
