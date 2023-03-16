@@ -16,6 +16,33 @@ import java.util.List;
 @Entity
 public class RealEstate implements Parcelable {
 
+    @ColumnInfo(name = "listing_date")
+    Date mListingDate;
+    @ColumnInfo(name = "sale_date")
+    Date       mSaleDate;
+    @PrimaryKey(autoGenerate = true)
+    private long mID;
+    private String mName;
+
+    private String mJsonPoint;
+
+    protected RealEstate(Parcel in) {
+        mID = in.readLong();
+        mName = in.readString();
+        mJsonPoint = in.readString();
+        mRegion = in.readString();
+        mLocation = in.readString();
+        mDescription = in.readString();
+        mFeaturedMediaUrl = in.readString();
+        mAgentName = in.readString();
+        mPrice = in.readInt();
+        mSurface = in.readInt();
+        mRooms = in.readInt();
+        mBathrooms = in.readInt();
+        mBedrooms = in.readInt();
+        mMediaList = in.createTypedArrayList(RealEstateMedia.CREATOR);
+    }
+
     public static final Creator<RealEstate> CREATOR = new Creator<RealEstate>() {
         @Override
         public RealEstate createFromParcel(Parcel in) {
@@ -27,13 +54,15 @@ public class RealEstate implements Parcelable {
             return new RealEstate[size];
         }
     };
-    @ColumnInfo(name = "listing_date")
-    Date mListingDate;
-    @ColumnInfo(name = "sale_date")
-    Date       mSaleDate;
-    @PrimaryKey(autoGenerate = true)
-    private long mID;
-    private String mName;
+
+    public String getJsonPoint() {
+        return mJsonPoint;
+    }
+
+    public void setJsonPoint(String jsonPoint) {
+        mJsonPoint = jsonPoint;
+    }
+
     private String mRegion;
     private String mLocation;
     private String mDescription;
@@ -99,21 +128,6 @@ public class RealEstate implements Parcelable {
         mMediaList = mediaList;
     }
 
-    protected RealEstate(Parcel in) {
-        mID = in.readLong();
-        mName = in.readString();
-        mRegion = in.readString();
-        mLocation = in.readString();
-        mDescription = in.readString();
-        mPrice = in.readInt();
-        mSurface = in.readInt();
-        mRooms = in.readInt();
-        mBathrooms = in.readInt();
-        mBedrooms = in.readInt();
-        mFeaturedMediaUrl = in.readString();
-        mMediaList = in.createTypedArrayList(RealEstateMedia.CREATOR);
-    }
-
     public static List<RealEstate> getDataExample() {
 
         List<RealEstate> estates = new ArrayList<>();
@@ -122,9 +136,9 @@ public class RealEstate implements Parcelable {
         String desc3 = "Poised high atop a promontory, this palatial European Estate boasts jaw-dropping 360 degree views of all of Los Angeles. Rich in privacy behind gates and up the long tree-lined driveway, this fortress of unparalleled magnitude is revealed. Situated in a world of its own overlooking the stunning gardens and city, this home is the epitome of royal living in the most sought-after city in the country. High ceilings, ornate details and grand-scale rooms are showcased beyond the luxurious foyer and Imperial Staircase through the massive double door entrance. Highlights from the main floor include an industrial grade chef's kitchen with an adjacent light and bright breakfast room, a formal dining room with double doors made with Venetian stained glass windows, an impressive living room with a gorgeous bar and fireplace, a billiards room, and a formal sitting room. Among the many jewels of this home is the two story library which includes a steel spiral staircase and a vibrant irreplaceable stained glass light fixture. Upstairs, the master bedroom rivals that of a European castle with multiple private terraces, city and nature views, his and hers closets, a massage room and a luxurious bathroom made with lapis stone. In addition to the master suite there are four oversized en suite bedrooms each with beautiful views and walk in closets. The lower level is an entertainer's paradise with a theater, ballroom that opens up to a sprawling terrace where your guests can soak in the picturesque views, and a wine cellar that's authentically outfitted as the storefront of an early 18th century English saloon. The backyard consists of a sparkling pool and spa, outdoor kitchen, putting green, a fruit and vegetable garden, tennis court, koi pond, and endless places for dining al fresco. In addition to the various amenities, the home is also equipped with an oversized gym. This tranquil oasis is quintessential to the highest class of luxury living, built for those who hold history, design, and beauty in the highest regard.";
 
 
-        estates.add(new RealEstate(1, "The one", "BEL AIR, CA 90077","Address",desc1,280000000,50000,56,12,24,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-1.jpg"));
-        estates.add( new RealEstate( 2,"11630 Moraga Ln", "LOS ANGELES, CA 90049","Address", desc2,18800000,46000,10,10,10, "https://aaronkirman.com/wp-content/uploads/2022/04/163A3878.jpg"));
-        estates.add( new RealEstate( 3,"1420 Davies Dr", "BEVERLY HILLS, CA 90210","Address",desc3, 87000000,113000,17,12,12, "https://aaronkirman.com/wp-content/uploads/2022/01/163A0320.jpg"));
+        estates.add(new RealEstate(1, "The one", "BEL AIR, CA 90077","The one BEL AIR, CA 90077",desc1,280000000,50000,56,12,24,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-1.jpg"));
+        estates.add( new RealEstate( 2,"11630 Moraga Ln", "LOS ANGELES, CA 90049","11630 Moraga Ln LOS ANGELES, CA 90049", desc2,18800000,46000,10,10,10, "https://aaronkirman.com/wp-content/uploads/2022/04/163A3878.jpg"));
+        estates.add( new RealEstate( 3,"1420 Davies Dr", "BEVERLY HILLS, CA 90210","1420 Davies Dr BEVERLY HILLS, CA 90210",desc3, 87000000,113000,17,12,12, "https://aaronkirman.com/wp-content/uploads/2022/01/163A0320.jpg"));
 
 
         return estates;
@@ -248,15 +262,17 @@ public class RealEstate implements Parcelable {
     public void writeToParcel(@NonNull Parcel parcel, int i) {
         parcel.writeLong(mID);
         parcel.writeString(mName);
+        parcel.writeString(mJsonPoint);
         parcel.writeString(mRegion);
         parcel.writeString(mLocation);
         parcel.writeString(mDescription);
+        parcel.writeString(mFeaturedMediaUrl);
+        parcel.writeString(mAgentName);
         parcel.writeInt(mPrice);
         parcel.writeInt(mSurface);
         parcel.writeInt(mRooms);
         parcel.writeInt(mBathrooms);
         parcel.writeInt(mBedrooms);
-        parcel.writeString(mFeaturedMediaUrl);
         parcel.writeTypedList(mMediaList);
     }
 }

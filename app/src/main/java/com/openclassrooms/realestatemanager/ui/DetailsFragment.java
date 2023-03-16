@@ -3,7 +3,6 @@ package com.openclassrooms.realestatemanager.ui;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,19 +11,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.DatePicker;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.FutureTarget;
+import com.bumptech.glide.request.target.Target;
 import com.mapbox.api.staticmap.v1.MapboxStaticMap;
 import com.mapbox.api.staticmap.v1.StaticMapCriteria;
+import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation;
 import com.mapbox.geojson.Point;
 import com.mapbox.search.ResponseInfo;
 import com.mapbox.search.SearchEngine;
@@ -39,24 +39,25 @@ import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.SaveImageTask;
 import com.openclassrooms.realestatemanager.Utils;
 import com.openclassrooms.realestatemanager.databinding.ActivityDetailsBinding;
+import com.openclassrooms.realestatemanager.event.OnMapCreated;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.model.RealEstate;
 import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
-public class DetailsFragment extends Fragment {
+public class DetailsFragment extends Fragment{
 
     private SearchEngine searchEngine;
+    private Point mCenterPoint;
     private AsyncOperationTask searchRequestTask;
+
+    OnMapCreated mOnMapCreated = this::updateMap;
+
+
 
     private final SearchSelectionCallback searchCallback = new SearchSelectionCallback() {
         @Override
@@ -71,18 +72,28 @@ public class DetailsFragment extends Fragment {
 
         @Override
         public void onResult(@NonNull SearchSuggestion suggestion, @NonNull SearchResult result, @NonNull ResponseInfo info) {
-            Point centerPoint = result.getCoordinate();
+            mCenterPoint = result.getCoordinate();
+            mEstate.setJsonPoint(mCenterPoint.toJson());
+            mRealEstateViewModel.createOrUpdateRealEstate(mEstate);
+            List<StaticMarkerAnnotation> staticMarkerAnnotations = new ArrayList<>();
+            staticMarkerAnnotations.add(StaticMarkerAnnotation.builder()
+                    .lnglat(mCenterPoint)
+                    .color(255, 0, 0)
+                    .build());
+
             MapboxStaticMap staticMap = MapboxStaticMap.builder()
                     .accessToken(requireActivity().getString(R.string.mapbox_access_token))
                     .styleId(StaticMapCriteria.STREET_STYLE)
-                    .cameraPoint(centerPoint)
-                    .cameraZoom(16)
-                    .width(600)
-                    .height(600)
+                    .cameraPoint(mCenterPoint)
+                    .cameraZoom(14)
+                    .width(300)
+                    .height(300)
                     .retina(true)
+                    .staticMarkerAnnotations(staticMarkerAnnotations)
                     .build();
-            SaveImageTask saveImageTask = new SaveImageTask(requireContext());
-            saveImageTask.execute(staticMap.url().toString(),mEstate.getLocation() + " " + mEstate.getRegion());
+            SaveImageTask saveImageTask = new SaveImageTask(requireContext(),mOnMapCreated);
+            saveImageTask.execute(staticMap.url().toString(),mEstate.getLocation() + ".jpg");
+
         }
 
 
@@ -128,13 +139,10 @@ public class DetailsFragment extends Fragment {
 
             case 3 : //sell
                 Calendar cal = Calendar.getInstance();
-                DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        cal.set(year,month, dayOfMonth);
-                        mEstate.setSaleDate(cal.getTime());
-                        mRealEstateViewModel.createOrUpdateRealEstate(mEstate);
-                    }
+                DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
+                    cal.set(year,month, dayOfMonth);
+                    mEstate.setSaleDate(cal.getTime());
+                    mRealEstateViewModel.createOrUpdateRealEstate(mEstate);
                 }, cal.get(Calendar.YEAR),cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
                 datePickerDialog.show();
                 break;
@@ -177,31 +185,45 @@ public class DetailsFragment extends Fragment {
         mBinding.rooms.setText(getString(R.string.number_of_rooms,mEstate.getRooms()));
 
         //MAP
-        File file = new File(requireContext().getFilesDir(),mEstate.getLocation() + " " + mEstate.getRegion());
+        File file = new File(requireContext().getFilesDir(),mEstate.getLocation()+ ".jpg");
 
         if(file.exists()){
-            Glide.with(requireContext())
-                    .load(file)
-                    .into(mBinding.staticMap);
+            updateMap(file);
         } else if (Utils.isInternetAvailable(requireContext())) {
             searchEngine = SearchEngine.createSearchEngineWithBuiltInDataProviders(
                     new SearchEngineSettings(getString(R.string.mapbox_access_token))
             );
 
             final SearchOptions options = new SearchOptions.Builder()
-                    .limit(5)
+                    .limit(1)
                     .build();
 
             searchRequestTask = searchEngine.search(mEstate.getLocation(), options, searchCallback);
-
-
-
         }
 
+        mBinding.staticMap.setOnClickListener(view -> {
+            mCenterPoint = Point.fromJson(mEstate.getJsonPoint());
+            mBinding.staticMap.setClickable(false);
+            mBinding.staticMap.setFocusable(false);
+            mBinding.staticMap.setOnClickListener(null);
+            MapFragment mapFragment = MapFragment.newInstance(mEstate);
+
+            FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+            transaction.replace(mBinding.mapContainer.getId(), mapFragment);
+            transaction.commit();
+            Log.d("TAG", "onCreateView: CLICKED");
+        });
 
         return mBinding.getRoot();
 
 
+    }
+
+    private void updateMap(File file) {
+        Glide.with(requireContext())
+                .load(file)
+                .override(Target.SIZE_ORIGINAL)
+                .into(mBinding.staticMap);
     }
 
     private void mediaObserver(List<RealEstateMedia> mediaList) {
@@ -212,6 +234,5 @@ public class DetailsFragment extends Fragment {
 
 
     }
-
 
 }

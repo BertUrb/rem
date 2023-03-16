@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.mapbox.maps.plugin.Plugin;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateRvAdapter;
 import com.openclassrooms.realestatemanager.Utils;
@@ -33,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding mBinding;
     private RealEstateViewModel mRealEstateViewModel;
     private List<RealEstate> mEstates = new ArrayList<>();
+
+
+
 
     private int selectedPosition = -1;
 

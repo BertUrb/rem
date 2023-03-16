@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.FutureTarget;
+import com.openclassrooms.realestatemanager.event.OnMapCreated;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,10 +15,12 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public class SaveImageTask extends AsyncTask<String, Void, Boolean> {
-    private Context mContext;
+    private final Context mContext;
+    private OnMapCreated mMapCreated;
+    private File mFile;
 
-    public SaveImageTask(Context context) {
-        mContext = context;
+    public SaveImageTask(Context context,OnMapCreated mapCreated) {
+        mContext = context;mMapCreated =mapCreated;
     }
 
     @Override
@@ -37,8 +40,8 @@ public class SaveImageTask extends AsyncTask<String, Void, Boolean> {
             Bitmap bitmap = futureTarget.get();
 
             // Save the Bitmap to a file
-            File file = new File(mContext.getFilesDir(), name);
-            FileOutputStream fos = new FileOutputStream(file);
+           mFile = new File(mContext.getFilesDir(), name);
+            FileOutputStream fos = new FileOutputStream(mFile);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
             fos.close();
@@ -53,6 +56,7 @@ public class SaveImageTask extends AsyncTask<String, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean result) {
+        mMapCreated.onMapCreated(mFile);
       }
 }
 
