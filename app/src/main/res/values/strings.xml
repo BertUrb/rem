@@ -37,5 +37,6 @@
     <string name="error_insert_not_supported">Insert operation is not supported</string>
     <string name="error_delete_not_supported">Delete operation is not supported</string>
     <string name="error_update_not_supported">Update operation is not supported</string>
+    <string name="error_fail_query_row_from_uri">Failed to query row for uri  %s</string>
 
 </resources>

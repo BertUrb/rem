@@ -38,7 +38,7 @@ public class RealEstateMediaContentProvider extends ContentProvider {
 
         }
 
-        throw new IllegalArgumentException("Failed to query row for uri " + uri);
+        throw new IllegalArgumentException(getContext().getString(R.string.error_fail_query_row_from_uri,uri));
 
     }
 
