@@ -1,5 +1,6 @@
 package com.openclassrooms.realestatemanager.model;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -30,6 +31,22 @@ public class RealEstate implements Parcelable {
     private String mName;
 
     private String mJsonPoint;
+
+    private String mRegion;
+    private String mLocation;
+    private String mDescription;
+    private String mFeaturedMediaUrl;
+    @Ignore
+    private Boolean isSync = false;
+
+    private String mAgentName;
+    private int mPrice,
+            mSurface,
+            mRooms,
+            mBathrooms,
+            mBedrooms;
+    @Ignore
+    private List<RealEstateMedia> mMediaList;
 
     protected RealEstate(Parcel in) {
         mID = in.readLong();
@@ -68,12 +85,7 @@ public class RealEstate implements Parcelable {
         mJsonPoint = jsonPoint;
     }
 
-    private String mRegion;
-    private String mLocation;
-    private String mDescription;
-    private String mFeaturedMediaUrl;
-    @Ignore
-    private Boolean isSync = false;
+
 
     public Boolean getSync() {
         return isSync;
@@ -95,14 +107,11 @@ public class RealEstate implements Parcelable {
         mAgentName = agentName;
     }
 
-    private String mAgentName;
-    private int mPrice,
-            mSurface,
-            mRooms,
-            mBathrooms,
-            mBedrooms;
-    @Ignore
-    private List<RealEstateMedia> mMediaList;
+
+
+    public RealEstate() {
+        // require empty constructor
+    }
 
     public RealEstate(long mID, String name, String region, String location, String description, int price, int surface, int rooms, int bathrooms, int bedrooms, String featuredMediaUrl, String agentName) {
         this.mID = mID;
@@ -317,6 +326,19 @@ public class RealEstate implements Parcelable {
 
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RealEstate estate = (RealEstate) o;
+        return getID() == estate.getID();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getID());
+    }
+
     public static RealEstate fromQueryDocumentSnapshot(QueryDocumentSnapshot document) {
 
         String agentName = document.getString("agentName");
@@ -337,6 +359,43 @@ public class RealEstate implements Parcelable {
 
         return realEstate;
 
+    }
+
+    public static RealEstate fromContentValues(ContentValues values) {
+        final RealEstate estate = new RealEstate();
+
+        if(values.containsKey("mID")) estate.setID(values.getAsLong("mID"));
+
+        if(values.containsKey("mName")) estate.setName(values.getAsString("mName"));
+
+        if(values.containsKey("mJsonPoint")) estate.setJsonPoint(values.getAsString("mJsonPoint"));
+
+        if(values.containsKey("mRegion")) estate.setRegion(values.getAsString("mRegion"));
+
+        if(values.containsKey("mLocation")) estate.setLocation(values.getAsString("mLocation"));
+
+
+        if(values.containsKey("mDescription")) estate.setDescription(values.getAsString("mDescription"));
+
+        if(values.containsKey("mFeaturedMediaUrl")) estate.setFeaturedMediaUrl(values.getAsString("mFeaturedMediaUrl"));
+
+        if(values.containsKey("mAgentName")) estate.setAgentName(values.getAsString("mAgentName"));
+
+        if(values.containsKey("mPrice")) estate.setPrice(values.getAsInteger("mPrice"));
+
+        if (values.containsKey("mSurface")) estate.setSurface(values.getAsInteger("mSurface"));
+
+        if(values.containsKey("mRooms")) estate.setRooms(values.getAsInteger("mRooms"));
+
+        if(values.containsKey("mBathrooms")) estate.setBathrooms(values.getAsInteger("mBathrooms"));
+
+        if(values.containsKey("mBedrooms")) estate.setBedrooms(values.getAsInteger("mBedrooms"));
+
+        if(values.containsKey("listing_date")) estate.setListingDate(new Date(values.getAsLong("listing_date")));
+
+        if(values.containsKey("sale_date")) estate.setSaleDate(new Date(values.getAsLong("sale_date")));
+
+        return estate;
     }
 }
 
