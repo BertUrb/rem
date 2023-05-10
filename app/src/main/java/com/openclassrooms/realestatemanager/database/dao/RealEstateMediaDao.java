@@ -1,5 +1,7 @@
 package com.openclassrooms.realestatemanager.database.dao;
 
+import android.database.Cursor;
+
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -14,6 +16,9 @@ import java.util.List;
 public interface RealEstateMediaDao {
     @Query("SELECT * FROM RealEstateMedia WHERE mRealEstateId = :realEstateID")
     LiveData<List<RealEstateMedia>> getMediaByRealEstateId(long realEstateID);
+
+    @Query("SELECT * FROM RealEstateMedia WHERE mRealEstateId = :realEstateID")
+    Cursor getMediaByRealEstateIdWithCursor(long realEstateID);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long addMedia(RealEstateMedia realEstateMedia);

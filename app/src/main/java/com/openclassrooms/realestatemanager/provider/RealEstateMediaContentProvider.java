@@ -12,13 +12,11 @@ import androidx.annotation.Nullable;
 import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.model.RealEstate;
 
-public class RealEstateContentProvider  extends ContentProvider {
-
+public class RealEstateMediaContentProvider extends ContentProvider {
 
     public static final String AUTHORITY = "com.openclassrooms.realestatemanager.provider";
 
     public static final String TABLE_NAME = RealEstate.class.getSimpleName();
-
     @Override
     public boolean onCreate() {
         return false;
@@ -52,19 +50,16 @@ public class RealEstateContentProvider  extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        //provider is read only
         return null;
     }
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        //provider is read only
         return 0;
     }
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
-        //provider is read only
         return 0;
     }
 }
