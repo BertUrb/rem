@@ -34,4 +34,8 @@
     <string name="internet_is_required">Internet is required for this feature</string>
     <string name="internet_is_required_first_run">Internet is required for the first run of this app !</string>
     <string name="agent">Agent: %s</string>
+    <string name="error_insert_not_supported">Insert operation is not supported</string>
+    <string name="error_delete_not_supported">Delete operation is not supported</string>
+    <string name="error_update_not_supported">Update operation is not supported</string>
+
 </resources>

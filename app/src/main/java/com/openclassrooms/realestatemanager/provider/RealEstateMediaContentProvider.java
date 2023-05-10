@@ -9,6 +9,7 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.model.RealEstate;
 
@@ -50,16 +51,16 @@ public class RealEstateMediaContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        return null;
+        throw new UnsupportedOperationException(getContext().getString(R.string.error_insert_not_supported));
     }
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+        throw new UnsupportedOperationException(getContext().getString(R.string.error_delete_not_supported));
     }
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+        throw new UnsupportedOperationException(getContext().getString(R.string.error_update_not_supported));
     }
 }
