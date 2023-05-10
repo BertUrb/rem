@@ -3,6 +3,7 @@ package com.openclassrooms.realestatemanager.ui;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.openclassrooms.realestatemanager.model.RealEstate;
 import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 import com.openclassrooms.realestatemanager.repositories.RealEstateMediaRepo;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 public class RealEstateViewModel extends ViewModel {
+
     private final RealEstateRepo mRealEstateRepo;
     private final RealEstateMediaRepo mRealEstateMediaRepo;
     private final Executor mExecutor;
@@ -37,6 +39,11 @@ public class RealEstateViewModel extends ViewModel {
             media.setRealEstateId(estate.getID());
             mExecutor.execute(() -> mRealEstateMediaRepo.addRealEstateMedia(media));
         }
+
     }
+
+
+
+
 
 }

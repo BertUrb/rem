@@ -9,7 +9,10 @@ import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Entity(foreignKeys = @ForeignKey(entity = RealEstate.class,parentColumns = "mID",childColumns = "mRealEstateId"))
@@ -22,7 +25,18 @@ public class RealEstateMedia implements Parcelable {
     @PrimaryKey(autoGenerate = true)
     private long mID;
 
-    public RealEstateMedia(long mID,long realEstateId, @NonNull String mediaUrl, @NonNull String mediaCaption) {
+    @Ignore
+    private Boolean isSync = false;
+
+    public Boolean getSync() {
+        return isSync;
+    }
+
+    public void setSync(Boolean sync) {
+        isSync = sync;
+    }
+
+    public RealEstateMedia(long mID, long realEstateId, @NonNull String mediaUrl, @NonNull String mediaCaption) {
         this.mID = mID;
         mRealEstateId = realEstateId;
         mMediaUrl = mediaUrl;
@@ -76,36 +90,38 @@ public class RealEstateMedia implements Parcelable {
         mID = ID;
     }
 
+    @NonNull
     public String getMediaUrl() {
         return mMediaUrl;
     }
 
-    public void setMediaUrl(String mediaUrl) {
+    public void setMediaUrl(@NonNull String mediaUrl) {
         mMediaUrl = mediaUrl;
     }
 
+    @NonNull
     public String getMediaCaption() {
         return mMediaCaption;
     }
 
-    public void setMediaCaption(String mediaCaption) {
+    public void setMediaCaption(@NonNull String mediaCaption) {
         mMediaCaption = mediaCaption;
     }
 
     public static List<RealEstateMedia> getMediaExamples() {
         List<RealEstateMedia> medias =  new ArrayList<>();
 
-        medias.add(new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-1.jpg","Whole house"));
-        medias.add(new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-13.jpg","Play Room"));
-        medias.add(new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-16.jpg","Library"));
-        medias.add(new RealEstateMedia(0,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-24.jpg","Bedroom"));
-        medias.add(new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A5194.jpg","Outside"));
-        medias.add(new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A3878.jpg","Inside 1"));
-        medias.add(new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A3930.jpg","Inside 2"));
-        medias.add(new RealEstateMedia(0,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A4070.jpg","Inside 3"));
-        medias.add(new RealEstateMedia(0,3,"https://aaronkirman.com/wp-content/uploads/2022/01/DJI_0648.jpg","Outside"));
-        medias.add(new RealEstateMedia(0,3,"https://aaronkirman.com/wp-content/uploads/2022/01/163A0232.jpg","Inside 1"));
-        medias.add(new RealEstateMedia(0,3,"https://aaronkirman.com/wp-content/uploads/2022/01/163A0320.jpg","Inside 2"));
+        medias.add(new RealEstateMedia(1,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-1.jpg","Whole house"));
+        medias.add(new RealEstateMedia(2,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-13.jpg","Play Room"));
+        medias.add(new RealEstateMedia(3,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-16.jpg","Library"));
+        medias.add(new RealEstateMedia(4,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-24.jpg","Bedroom"));
+        medias.add(new RealEstateMedia(5,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A5194.jpg","Outside"));
+        medias.add(new RealEstateMedia(6,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A3878.jpg","Inside 1"));
+        medias.add(new RealEstateMedia(7,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A3930.jpg","Inside 2"));
+        medias.add(new RealEstateMedia(8,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A4070.jpg","Inside 3"));
+        medias.add(new RealEstateMedia(9,3,"https://aaronkirman.com/wp-content/uploads/2022/01/DJI_0648.jpg","Outside"));
+        medias.add(new RealEstateMedia(10,3,"https://aaronkirman.com/wp-content/uploads/2022/01/163A0232.jpg","Inside 1"));
+        medias.add(new RealEstateMedia(11,3,"https://aaronkirman.com/wp-content/uploads/2022/01/163A0320.jpg","Inside 2"));
 
         return medias;
     }
@@ -122,4 +138,28 @@ public class RealEstateMedia implements Parcelable {
         parcel.writeLong(mRealEstateId);
         parcel.writeLong(mID);
     }
+
+    public HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("mediaUrl", mMediaUrl);
+        map.put("mediaCaption",mMediaCaption);
+        map.put("realEstateId",mRealEstateId);
+
+        return map;
+
+    }
+
+    public static RealEstateMedia fromQueryDocumentSnapshot(QueryDocumentSnapshot document) {
+        long id =  Long.parseLong(document.getId().substring(2));
+        RealEstateMedia media = new  RealEstateMedia(id,
+                document.getLong("realEstateId"),
+                document.getString("mediaUrl"),
+                document.getString("mediaCaption"));
+
+        media.setSync(true);
+
+        return media;
+    }
+
+
 }

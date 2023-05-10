@@ -1,5 +1,6 @@
 package com.openclassrooms.realestatemanager.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
@@ -11,10 +12,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
@@ -22,6 +25,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.mapbox.api.staticmap.v1.MapboxStaticMap;
 import com.mapbox.api.staticmap.v1.StaticMapCriteria;
 import com.mapbox.api.staticmap.v1.models.StaticMarkerAnnotation;
@@ -31,7 +36,6 @@ import com.mapbox.search.SearchEngine;
 import com.mapbox.search.SearchEngineSettings;
 import com.mapbox.search.SearchOptions;
 import com.mapbox.search.SearchSelectionCallback;
-import com.mapbox.search.common.AsyncOperationTask;
 import com.mapbox.search.result.SearchResult;
 import com.mapbox.search.result.SearchSuggestion;
 import com.openclassrooms.realestatemanager.MediaGalleryAdapter;
@@ -48,16 +52,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 public class DetailsFragment extends Fragment{
 
     private SearchEngine searchEngine;
     private Point mCenterPoint;
-    private AsyncOperationTask searchRequestTask;
 
     OnMapCreated mOnMapCreated = this::updateMap;
-
-
 
     private final SearchSelectionCallback searchCallback = new SearchSelectionCallback() {
         @Override
@@ -66,7 +68,7 @@ public class DetailsFragment extends Fragment{
                 Log.i("SearchApiExample", "No suggestions found");
             } else {
                 Log.i("SearchApiExample", "Search suggestions: " + suggestions + "\nSelecting first...");
-                searchRequestTask = searchEngine.select(suggestions.get(0), this);
+                searchEngine.select(suggestions.get(0), this);
             }
         }
 
@@ -85,9 +87,9 @@ public class DetailsFragment extends Fragment{
                     .accessToken(requireActivity().getString(R.string.mapbox_access_token))
                     .styleId(StaticMapCriteria.STREET_STYLE)
                     .cameraPoint(mCenterPoint)
-                    .cameraZoom(14)
-                    .width(300)
-                    .height(300)
+                    .cameraZoom(10)
+                    .width(400)
+                    .height(400)
                     .retina(true)
                     .staticMarkerAnnotations(staticMarkerAnnotations)
                     .build();
@@ -150,6 +152,16 @@ public class DetailsFragment extends Fragment{
                 //todo
                 break;
 
+            case 5 : // map
+                if(Utils.isInternetAvailable(requireContext())){
+                    Intent mapActivityIntent = new Intent(requireContext(),MapActivity.class);
+                    startActivity(mapActivityIntent);
+                }
+                else {
+                    Toast.makeText(requireContext(),requireContext().getString(R.string.internet_is_required),Toast.LENGTH_LONG).show();
+                }
+                break;
+
 
         }
         return super.onOptionsItemSelected(item);
@@ -183,8 +195,73 @@ public class DetailsFragment extends Fragment{
         mBinding.surface.setText(getString(R.string.surface,mEstate.getSurface()));
         mBinding.bathrooms.setText(getString(R.string.number_of_bathrooms,mEstate.getBathrooms()));
         mBinding.rooms.setText(getString(R.string.number_of_rooms,mEstate.getRooms()));
+        mBinding.agentTextView.setText(getString(R.string.agent, Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName()));
 
         //MAP
+
+
+        return mBinding.getRoot();
+
+
+    }
+
+    private void updateMap(File file) {
+        if(isAdded()) {
+            Glide.with(requireActivity())
+                    .load(file)
+                    .override(Target.SIZE_ORIGINAL)
+                    .into(mBinding.staticMap);
+        }
+    }
+
+    private void mediaObserver(List<RealEstateMedia> mediaList) {
+        mEstate.setMediaList(mediaList);
+        MediaGalleryAdapter mediaGalleryAdapter= new MediaGalleryAdapter(mEstate.getMediaList());
+        mBinding.mediaGallery.setAdapter(mediaGalleryAdapter);
+        mBinding.mediaGallery.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+
+        SyncDB();
+
+    }
+
+    private void SyncDB() {
+        if (Utils.isInternetAvailable(requireContext())) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            if(!mEstate.getSync()) {
+                db.collection("estates")
+                        .document(mEstate.getAgentName() + mEstate.getID()).set(mEstate.toHashMap())
+                        .addOnCompleteListener(task -> {
+                            mEstate.setSync(true);
+                            if (!task.isSuccessful()) {
+                                mEstate.setSync(false);
+                            }
+                        });
+            }
+
+            List<RealEstateMedia> mediaList = mEstate.getMediaList();
+            if (mediaList != null) {
+                for (RealEstateMedia media : mediaList) {
+                    if (!media.getSync()) {
+                        db.collection("medias")
+                                .document(mEstate.getAgentName() + media.getID())
+                                .set(media.toHashMap())
+                                .addOnCompleteListener(mediaTask -> {
+                                    media.setSync(true);
+                                    if (!mediaTask.isSuccessful()) {
+                                        media.setSync(false);
+                                    }
+                                });
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         File file = new File(requireContext().getFilesDir(),mEstate.getLocation()+ ".jpg");
 
         if(file.exists()){
@@ -198,41 +275,43 @@ public class DetailsFragment extends Fragment{
                     .limit(1)
                     .build();
 
-            searchRequestTask = searchEngine.search(mEstate.getLocation(), options, searchCallback);
+          searchEngine.search(mEstate.getLocation(), options, searchCallback);
         }
 
-        mBinding.staticMap.setOnClickListener(view -> {
+        mBinding.staticMap.setOnClickListener(v2 -> {
             mCenterPoint = Point.fromJson(mEstate.getJsonPoint());
-            mBinding.staticMap.setClickable(false);
-            mBinding.staticMap.setFocusable(false);
-            mBinding.staticMap.setOnClickListener(null);
-            MapFragment mapFragment = MapFragment.newInstance(mEstate);
 
-            FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-            transaction.replace(mBinding.mapContainer.getId(), mapFragment);
-            transaction.commit();
-            Log.d("TAG", "onCreateView: CLICKED");
+            if(Utils.isInternetAvailable(requireContext())) {
+                mBinding.staticMap.setClickable(false);
+                mBinding.staticMap.setFocusable(false);
+                mBinding.staticMap.setOnClickListener(null);
+                MapFragment mapFragment = MapFragment.newInstance(mEstate);
+
+                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(mBinding.mapContainer.getId(), mapFragment);
+                transaction.commit();
+                Log.d("TAG", "onCreateView: CLICKED");
+
+                // Disable scrolling in rootCL when MapView has focus
+                mBinding.rootCL.setOnTouchListener((v, event) -> {
+
+
+                    if (mapFragment.requireView().hasFocus()) {
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        Log.d("TAG", "FOCUS");
+                    } else {
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        Log.d("TAG", "PAS FOCUS");
+
+                    }
+                    return false;
+
+                });
+
+
+            }
+
+
         });
-
-        return mBinding.getRoot();
-
-
     }
-
-    private void updateMap(File file) {
-        Glide.with(requireContext())
-                .load(file)
-                .override(Target.SIZE_ORIGINAL)
-                .into(mBinding.staticMap);
-    }
-
-    private void mediaObserver(List<RealEstateMedia> mediaList) {
-        mEstate.setMediaList(mediaList);
-        MediaGalleryAdapter mediaGalleryAdapter= new MediaGalleryAdapter(mEstate.getMediaList());
-        mBinding.mediaGallery.setAdapter(mediaGalleryAdapter);
-        mBinding.mediaGallery.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-
-
-    }
-
 }

@@ -1,7 +1,11 @@
 package com.openclassrooms.realestatemanager.repositories;
 
+import android.app.Application;
+
 import androidx.lifecycle.LiveData;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.openclassrooms.realestatemanager.Utils;
 import com.openclassrooms.realestatemanager.database.dao.RealEstateDao;
 import com.openclassrooms.realestatemanager.model.RealEstate;
 
@@ -20,5 +24,6 @@ public class RealEstateRepo {
 
     public long createOrUpdateRealEstate(RealEstate estate) {
         return mRealEstateDao.createOrUpdateRealEstate(estate);
+
     }
 }

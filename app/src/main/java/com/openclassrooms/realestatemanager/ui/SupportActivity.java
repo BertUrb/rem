@@ -1,6 +1,7 @@
 package com.openclassrooms.realestatemanager.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
@@ -17,18 +18,40 @@ public class SupportActivity extends AppCompatActivity {
 
         ActivitySupportBinding binder = ActivitySupportBinding.inflate(getLayoutInflater());
         setContentView(binder.getRoot());
-        Bundle bundle = new Bundle();
-        RealEstate realEstate = getIntent().getParcelableExtra("REAL_ESTATE");
-        bundle.putParcelable("REAL_ESTATE", realEstate );
 
+        RealEstate realEstate = getIntent().getParcelableExtra("REAL_ESTATE");
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        DetailsFragment fragment = new DetailsFragment();
-        fragment.setArguments(bundle);
 
-        transaction.replace(binder.SupportFrame.getId(), fragment);
-        getSupportActionBar().setTitle(realEstate.getName());
-        transaction.commit();
+        if(realEstate != null) {
+            //real estate
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("REAL_ESTATE", realEstate);
+
+
+             DetailsFragment fragment = new DetailsFragment();
+            fragment.setArguments(bundle);
+
+            transaction.replace(binder.SupportFrame.getId(), fragment);
+            getSupportActionBar().setTitle(realEstate.getName());
+            transaction.commit();
+
+        }
+        else {
+            //map
+           /* MapFragment mapFragment = MapFragment.newInstance(null);
+
+            // Set the layout parameters for the fragment
+
+            transaction.replace(binder.SupportFrame.getId(), mapFragment);
+            getSupportActionBar().setTitle("Map");
+            transaction.commit();
+*/
+
+        }
+
+
+
 
     }
 }

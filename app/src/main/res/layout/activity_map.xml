@@ -2,18 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/SupportActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.SupportActivity">
+    tools:context=".ui.MapActivity">
 
-    <ScrollView
+    <FrameLayout
+        android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <FrameLayout
-            android:id="@+id/SupportFrame"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </ScrollView>
+        android:layout_height="match_parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

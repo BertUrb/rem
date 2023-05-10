@@ -1,22 +1,19 @@
 package com.openclassrooms.realestatemanager.ui;
 
-import android.app.Application;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.util.Log;
 import android.view.View;
 import android.widget.ScrollView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.mapbox.maps.plugin.Plugin;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateRvAdapter;
 import com.openclassrooms.realestatemanager.Utils;
@@ -32,23 +29,15 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding mBinding;
-    private RealEstateViewModel mRealEstateViewModel;
-    private List<RealEstate> mEstates = new ArrayList<>();
-
-
-
-
-    private int selectedPosition = -1;
-
-
+    private final List<RealEstate> mEstates = new ArrayList<>();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        mRealEstateViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this)).get(RealEstateViewModel.class);
-        mRealEstateViewModel.getRealEstates().observe(this,this::getEstatesObserver);
+        RealEstateViewModel realEstateViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this)).get(RealEstateViewModel.class);
+        realEstateViewModel.getRealEstates().observe(this, this::getEstatesObserver);
 
 
     }
@@ -56,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private void getEstatesObserver(List<RealEstate> estates) {
         mEstates.clear();
         mEstates.addAll(estates);
-        if(estates.size()>0)
+        if (estates.size() > 0)
             updateEstates();
 
     }
@@ -65,10 +54,9 @@ public class MainActivity extends AppCompatActivity {
     private void updateEstates() {
         OnRealEstateClickListener onRealEstateClickListener = position -> {
             RealEstate realEstate = mEstates.get(position);
-             selectedPosition = position;
 
 
-            if(mBinding.detailViewContainer.getVisibility() == View.VISIBLE) {
+            if (mBinding.detailViewContainer.getVisibility() == View.VISIBLE) {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("REAL_ESTATE", realEstate);
 
@@ -77,31 +65,22 @@ public class MainActivity extends AppCompatActivity {
                 fragment.setArguments(bundle);
                 int color = Color.BLUE;
                 String title = realEstate.getName();
-                if(realEstate.getSaleDate() != null) {
-                    color =  Color.RED;
+                if (realEstate.getSaleDate() != null) {
+                    color = Color.RED;
                     title += " " + getString(R.string.sold, realEstate.getSaleDate());
                 }
                 Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(color));
                 getSupportActionBar().setTitle(title);
 
-
-
-
-
                 transaction.replace(mBinding.FragmentContainer.getId(), fragment);
                 transaction.commit();
 
-            }
-            else {
+            } else {
                 Intent intent = new Intent(this, SupportActivity.class);
                 intent.putExtra("REAL_ESTATE", realEstate);
                 startActivity(intent);
 
             }
-
-
-            Toast.makeText(getApplicationContext(),"position:" + position,Toast.LENGTH_SHORT).show();
-
 
         };
         mBinding.realEstateListRv.setAdapter(new RealEstateRvAdapter(mEstates, onRealEstateClickListener));
@@ -109,10 +88,8 @@ public class MainActivity extends AppCompatActivity {
 
         ScrollView detailViewContainer = mBinding.detailViewContainer;
         if (Utils.isDeviceTablet(getApplicationContext())) {
-            //  getLayoutInflater().inflate(R.layout.activity_details,detailViewContainer);
             detailViewContainer.setVisibility(View.VISIBLE);
             onRealEstateClickListener.OnRealEstateClick(0);
-
 
 
         } else {
@@ -121,6 +98,48 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setContentView(mBinding.getRoot());
+        SyncDB();
 
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SyncDB();
+    }
+
+    private void SyncDB() {
+
+        if (Utils.isInternetAvailable(this)) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            for (RealEstate estate : mEstates) {
+                if (!estate.getSync()) {
+                    db.collection("estates").document(estate.getAgentName() + estate.getID()).set(estate.toHashMap())
+                            .addOnCompleteListener(task -> {
+                                estate.setSync(true);
+                                if (!task.isSuccessful()) {
+                                    estate.setSync(false);
+                                }
+                            });
+
+                }
+            }
+            db.collection("estates").addSnapshotListener((snapshots, e) -> {
+                if (e != null) {
+                    Log.w("TAG", "Erreur lors de l'écoute des modifications", e);
+                    return;
+                }
+
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    if (dc.getType() == DocumentChange.Type.ADDED) {
+                        RealEstate estate = RealEstate.fromQueryDocumentSnapshot(dc.getDocument());
+                        if (!mEstates.contains(estate)) {
+                            mEstates.add(estate);
+                        }
+                    }
+                }
+            });
+        }
     }
 }

@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.openclassrooms.realestatemanager.databinding.ActivityRealEstateEditorBinding;
 import com.openclassrooms.realestatemanager.event.EditTextFocusListener;
 import com.openclassrooms.realestatemanager.model.RealEstate;
@@ -93,6 +94,8 @@ public class RealEstateEditor extends AppCompatActivity {
                         Integer.parseInt(mBinding.etBathrooms.getText().toString()),
                         Integer.parseInt(mBinding.etBedrooms.getText().toString()),
                         mRealEstateMedias);
+
+            realEstate.setAgentName(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName());
 
                 if(mRealEstate != null) {
                     realEstate.setID(mRealEstate.getID());

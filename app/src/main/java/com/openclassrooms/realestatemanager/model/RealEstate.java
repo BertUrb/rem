@@ -9,9 +9,14 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class RealEstate implements Parcelable {
@@ -19,7 +24,7 @@ public class RealEstate implements Parcelable {
     @ColumnInfo(name = "listing_date")
     Date mListingDate;
     @ColumnInfo(name = "sale_date")
-    Date       mSaleDate;
+    Date mSaleDate;
     @PrimaryKey(autoGenerate = true)
     private long mID;
     private String mName;
@@ -67,6 +72,16 @@ public class RealEstate implements Parcelable {
     private String mLocation;
     private String mDescription;
     private String mFeaturedMediaUrl;
+    @Ignore
+    private Boolean isSync = false;
+
+    public Boolean getSync() {
+        return isSync;
+    }
+
+    public void setSync(Boolean sync) {
+        isSync = sync;
+    }
 
     public void setListingDate(Date listingDate) {
         mListingDate = listingDate;
@@ -89,8 +104,8 @@ public class RealEstate implements Parcelable {
     @Ignore
     private List<RealEstateMedia> mMediaList;
 
-    public RealEstate( long mID,String name, String region, String location, String description, int price, int surface, int rooms, int bathrooms, int bedrooms, String featuredMediaUrl) {
-        this.mID =mID;
+    public RealEstate(long mID, String name, String region, String location, String description, int price, int surface, int rooms, int bathrooms, int bedrooms, String featuredMediaUrl, String agentName) {
+        this.mID = mID;
         mName = name;
         mRegion = region;
         mLocation = location;
@@ -102,7 +117,7 @@ public class RealEstate implements Parcelable {
         mBedrooms = bedrooms;
         mFeaturedMediaUrl = featuredMediaUrl;
         mListingDate = new Date();
-        mAgentName = "temporaire: sera remplacé par l'user firebase";
+        mAgentName = agentName;
     }
 
     @Ignore
@@ -128,7 +143,11 @@ public class RealEstate implements Parcelable {
         mMediaList = mediaList;
     }
 
+
     public static List<RealEstate> getDataExample() {
+
+        String agentName = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
+
 
         List<RealEstate> estates = new ArrayList<>();
         String desc1 = "One of the finest properties in America, The One is situated on a four-acre Bel Air promontory, featuring thebest views of Los Angeles. A moat that encompasses the property gives the impression that it’s floating on water. The 100,000-square-foot glass and marble compound holds 20 bedrooms, each with sweeping views of Los Angeles and the ocean, and 30 bathrooms, as well as every amenity in the world. It features a 30-car garage, four swimming pools, a two-story waterfall, two restaurant-grade kitchens, an indoor/outdoor nightclub with its own VIP room, a movie theater, charitable organization rooms, a bowling alley, a library with floor-to-ceiling windows, a full beauty salon, a spa with a steam room and jacuzzi, a cigar lounge, and a gym. Three smaller villas also sit on the property, spread across the four acres. The 5,000-square-foot master suite is an oasis within the mansion. Designed with its own separate office and walk-in closet, the suite also has its own pool and kitchen. To guarantee privacy, it’s isolated from the rest of the house.The mansion includes five elevators and LED ceilings that display images of moving clouds. The One features state-of-the-art technology, with a full security center. The design encompasses secondary corridors for staff to use.";
@@ -136,9 +155,9 @@ public class RealEstate implements Parcelable {
         String desc3 = "Poised high atop a promontory, this palatial European Estate boasts jaw-dropping 360 degree views of all of Los Angeles. Rich in privacy behind gates and up the long tree-lined driveway, this fortress of unparalleled magnitude is revealed. Situated in a world of its own overlooking the stunning gardens and city, this home is the epitome of royal living in the most sought-after city in the country. High ceilings, ornate details and grand-scale rooms are showcased beyond the luxurious foyer and Imperial Staircase through the massive double door entrance. Highlights from the main floor include an industrial grade chef's kitchen with an adjacent light and bright breakfast room, a formal dining room with double doors made with Venetian stained glass windows, an impressive living room with a gorgeous bar and fireplace, a billiards room, and a formal sitting room. Among the many jewels of this home is the two story library which includes a steel spiral staircase and a vibrant irreplaceable stained glass light fixture. Upstairs, the master bedroom rivals that of a European castle with multiple private terraces, city and nature views, his and hers closets, a massage room and a luxurious bathroom made with lapis stone. In addition to the master suite there are four oversized en suite bedrooms each with beautiful views and walk in closets. The lower level is an entertainer's paradise with a theater, ballroom that opens up to a sprawling terrace where your guests can soak in the picturesque views, and a wine cellar that's authentically outfitted as the storefront of an early 18th century English saloon. The backyard consists of a sparkling pool and spa, outdoor kitchen, putting green, a fruit and vegetable garden, tennis court, koi pond, and endless places for dining al fresco. In addition to the various amenities, the home is also equipped with an oversized gym. This tranquil oasis is quintessential to the highest class of luxury living, built for those who hold history, design, and beauty in the highest regard.";
 
 
-        estates.add(new RealEstate(1, "The one", "BEL AIR, CA 90077","The one BEL AIR, CA 90077",desc1,280000000,50000,56,12,24,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-1.jpg"));
-        estates.add( new RealEstate( 2,"11630 Moraga Ln", "LOS ANGELES, CA 90049","11630 Moraga Ln LOS ANGELES, CA 90049", desc2,18800000,46000,10,10,10, "https://aaronkirman.com/wp-content/uploads/2022/04/163A3878.jpg"));
-        estates.add( new RealEstate( 3,"1420 Davies Dr", "BEVERLY HILLS, CA 90210","1420 Davies Dr BEVERLY HILLS, CA 90210",desc3, 87000000,113000,17,12,12, "https://aaronkirman.com/wp-content/uploads/2022/01/163A0320.jpg"));
+        estates.add(new RealEstate(1, "The one", "BEL AIR, CA 90077", "The one BEL AIR, CA 90077", desc1, 280000000, 50000, 56, 12, 24, "https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-1.jpg", agentName));
+        estates.add(new RealEstate(2, "11630 Moraga Ln", "LOS ANGELES, CA 90049", "11630 Moraga Ln LOS ANGELES, CA 90049", desc2, 18800000, 46000, 10, 10, 10, "https://aaronkirman.com/wp-content/uploads/2022/04/163A3878.jpg", agentName));
+        estates.add(new RealEstate(3, "1420 Davies Dr", "BEVERLY HILLS, CA 90210", "1420 Davies Dr BEVERLY HILLS, CA 90210", desc3, 87000000, 113000, 17, 12, 12, "https://aaronkirman.com/wp-content/uploads/2022/01/163A0320.jpg", agentName));
 
 
         return estates;
@@ -274,6 +293,50 @@ public class RealEstate implements Parcelable {
         parcel.writeInt(mBathrooms);
         parcel.writeInt(mBedrooms);
         parcel.writeTypedList(mMediaList);
+    }
+
+    public HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> map = new HashMap<>();
+
+        map.put("listingDate", mListingDate);
+        map.put("name", mName);
+        map.put("jsonPoint", mJsonPoint);
+        map.put("region", mRegion);
+        map.put("location", mLocation);
+        map.put("description", mDescription);
+        map.put("featuredMediaUrl", mFeaturedMediaUrl);
+        map.put("agentName", mAgentName);
+        map.put("price", mPrice);
+        map.put("Surface", mSurface);
+        map.put("rooms", mRooms);
+        map.put("bathrooms", mBathrooms);
+        map.put("bedrooms", mBedrooms);
+
+
+        return map;
+
+    }
+
+    public static RealEstate fromQueryDocumentSnapshot(QueryDocumentSnapshot document) {
+
+        String agentName = document.getString("agentName");
+        assert agentName != null;
+        long id =  Long.parseLong(document.getId().substring(agentName.length()));
+
+        RealEstate realEstate = new RealEstate(id,
+                document.getString("name"),
+                document.getString("region"), document.getString("location"), document.getString("description"),
+                document.getLong("price").intValue(),
+                document.getLong("Surface").intValue(),
+                 document.getLong("rooms").intValue(), document.getLong("bathrooms").intValue(), document.getLong("bedrooms").intValue(),
+                document.getString("featuredMediaUrl"),
+                agentName);
+
+        realEstate.setSync(true);
+        realEstate.setListingDate(document.getDate("listingDate"));
+
+        return realEstate;
+
     }
 }
 
