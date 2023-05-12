@@ -1,11 +1,9 @@
 package com.openclassrooms.realestatemanager.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.openclassrooms.realestatemanager.databinding.ActivitySupportBinding;
 import com.openclassrooms.realestatemanager.model.RealEstate;

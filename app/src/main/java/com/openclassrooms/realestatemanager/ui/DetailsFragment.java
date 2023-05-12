@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
@@ -38,6 +41,7 @@ import com.mapbox.search.SearchOptions;
 import com.mapbox.search.SearchSelectionCallback;
 import com.mapbox.search.result.SearchResult;
 import com.mapbox.search.result.SearchSuggestion;
+import android.Manifest;
 import com.openclassrooms.realestatemanager.MediaGalleryAdapter;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.SaveImageTask;
@@ -84,7 +88,7 @@ public class DetailsFragment extends Fragment{
                     .build());
 
             MapboxStaticMap staticMap = MapboxStaticMap.builder()
-                    .accessToken(requireActivity().getString(R.string.mapbox_access_token))
+                    .accessToken(requireContext().getString(R.string.mapbox_access_token))
                     .styleId(StaticMapCriteria.STREET_STYLE)
                     .cameraPoint(mCenterPoint)
                     .cameraZoom(10)
@@ -149,13 +153,19 @@ public class DetailsFragment extends Fragment{
                 datePickerDialog.show();
                 break;
             case 4 : //search
-                //todo
+                SearchModal searchModal = new SearchModal();
+                searchModal.show(getParentFragmentManager(), "searchModal");
                 break;
 
             case 5 : // map
                 if(Utils.isInternetAvailable(requireContext())){
-                    Intent mapActivityIntent = new Intent(requireContext(),MapActivity.class);
-                    startActivity(mapActivityIntent);
+                    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(requireActivity(), new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, 10);
+                    }
+                    else {
+                        Intent mapActivityIntent = new Intent(requireContext(), MapActivity.class);
+                        startActivity(mapActivityIntent);
+                    }
                 }
                 else {
                     Toast.makeText(requireContext(),requireContext().getString(R.string.internet_is_required),Toast.LENGTH_LONG).show();
@@ -264,7 +274,7 @@ public class DetailsFragment extends Fragment{
 
         File file = new File(requireContext().getFilesDir(),mEstate.getLocation()+ ".jpg");
 
-        if(file.exists()){
+        if(file.exists() && mEstate.getJsonPoint() != null){
             updateMap(file);
         } else if (Utils.isInternetAvailable(requireContext())) {
             searchEngine = SearchEngine.createSearchEngineWithBuiltInDataProviders(

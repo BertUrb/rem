@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateRvAdapter;
 import com.openclassrooms.realestatemanager.Utils;
@@ -21,6 +22,7 @@ import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding;
 import com.openclassrooms.realestatemanager.event.OnRealEstateClickListener;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.model.RealEstate;
+import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,23 +32,96 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding mBinding;
     private final List<RealEstate> mEstates = new ArrayList<>();
-
+    private RealEstateViewModel mRealEstateViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
-        RealEstateViewModel realEstateViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this)).get(RealEstateViewModel.class);
-        realEstateViewModel.getRealEstates().observe(this, this::getEstatesObserver);
+        mRealEstateViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this)).get(RealEstateViewModel.class);
+        mRealEstateViewModel.getRealEstates().observe(this, this::getEstatesObserver);
+
+    }
+
+    private void checkFirestore() {
+        if(Utils.isInternetAvailable(this)) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
+
+            db.collection("estates")
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        Log.d("TAG", "onCreate: DB SUCCESS ");
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            List<RealEstateMedia> mediaList = new ArrayList<>();
+                            RealEstate estate = RealEstate.fromQueryDocumentSnapshot(documentSnapshot);
+                            Log.d("TAG", "QuerySnapshot: " + estate.getName());
+
+                            if (!mEstates.contains(estate)) {
+                                Log.d("TAG", "New estate !! ");
+                               mRealEstateViewModel.createOrUpdateRealEstate(estate);
+
+
+                                db.collection("medias").whereEqualTo("realEstateId",estate.getID()).get().addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        Log.d("TAG", "MEDIA OK");
+
+                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                            RealEstateMedia media = RealEstateMedia.fromQueryDocumentSnapshot(document,estate.getAgentName().length());
+                                            Log.d("TAG", "media id: " + media.getID());
+
+                                                mediaList.add(media);
+
+
+                                        }
+                                        estate.setMediaList(mediaList);
+                                        mRealEstateViewModel.createOrUpdateRealEstate(estate);
+
+                                    } else {
+                                        Log.d("TAG", "Error getting documents: ", task.getException());
+                                    }
+                                });
+                                mEstates.add(estate);
+
+                            }
+                        }
+
+                        if (mEstates.size() > 0)
+                            updateEstates();
+                    });
+
+
+
+
+            db.collection("estates").addSnapshotListener((snapshots, e) -> {
+                if (e != null) {
+                    Log.w("TAG", "Erreur lors de l'écoute des modifications", e);
+                    return;
+                }
+
+                assert snapshots != null;
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    if (dc.getType() == DocumentChange.Type.ADDED) {
+                        RealEstate estate = RealEstate.fromQueryDocumentSnapshot(dc.getDocument());
+                        if (!mEstates.contains(estate)) {
+                            mEstates.add(estate);
+                        }
+                    }
+                }
+            });
+            SyncDB();
+        }
     }
 
     private void getEstatesObserver(List<RealEstate> estates) {
         mEstates.clear();
         mEstates.addAll(estates);
+
         if (estates.size() > 0)
             updateEstates();
+
+        checkFirestore();
 
     }
 
@@ -125,21 +200,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             }
-            db.collection("estates").addSnapshotListener((snapshots, e) -> {
-                if (e != null) {
-                    Log.w("TAG", "Erreur lors de l'écoute des modifications", e);
-                    return;
-                }
 
-                for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                    if (dc.getType() == DocumentChange.Type.ADDED) {
-                        RealEstate estate = RealEstate.fromQueryDocumentSnapshot(dc.getDocument());
-                        if (!mEstates.contains(estate)) {
-                            mEstates.add(estate);
-                        }
-                    }
-                }
-            });
         }
     }
 }

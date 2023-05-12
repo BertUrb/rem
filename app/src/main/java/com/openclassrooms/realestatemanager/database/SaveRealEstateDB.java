@@ -1,7 +1,6 @@
 package com.openclassrooms.realestatemanager.database;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -11,7 +10,6 @@ import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.openclassrooms.realestatemanager.Utils;
 import com.openclassrooms.realestatemanager.database.dao.RealEstateDao;
@@ -74,7 +72,7 @@ public abstract class SaveRealEstateDB extends RoomDatabase {
 
                         dbFs.collection("medias").get().addOnCompleteListener(mediaTask -> {
                             for (QueryDocumentSnapshot document : mediaTask.getResult()) {
-                                realEstateMedias.add(RealEstateMedia.fromQueryDocumentSnapshot(document));
+                                //realEstateMedias.add(RealEstateMedia.fromQueryDocumentSnapshot(document));
                             }
                             if (realEstateMedias.isEmpty()) {
                                 realEstateMedias.addAll(RealEstateMedia.getMediaExamples());

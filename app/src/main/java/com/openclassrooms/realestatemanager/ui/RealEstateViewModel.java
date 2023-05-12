@@ -42,6 +42,10 @@ public class RealEstateViewModel extends ViewModel {
 
     }
 
+    public void createOrUpdateRealEstateMedia(RealEstateMedia media) {
+        mExecutor.execute(() -> mRealEstateMediaRepo.addRealEstateMedia(media) );
+    }
+
 
 
 

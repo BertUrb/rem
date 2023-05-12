@@ -109,6 +109,7 @@ public class RealEstate implements Parcelable {
 
 
 
+    @Ignore
     public RealEstate() {
         // require empty constructor
     }

@@ -1,7 +1,6 @@
 package com.openclassrooms.realestatemanager.ui;
 
 import android.content.Context;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
