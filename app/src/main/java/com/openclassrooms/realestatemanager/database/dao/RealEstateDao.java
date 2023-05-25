@@ -32,6 +32,9 @@ public interface RealEstateDao {
     @Query("SELECT * From RealEstate WHERE mID= :id")
     Cursor getRealEstateWithCursor(long id);
 
+    @Query("SELECT * FROM RealEstate WHERE (:maxPrice IS NULL OR mPrice <= :maxPrice)  AND (:minPrice IS NULL OR mPrice >= :minPrice) AND (mSurface <= :maxSurface OR mSurface IS NULL) AND (mSurface >= :minSurface OR mSurface IS NULL) AND (:maxSaleDate IS NULL OR sale_date > :maxSaleDate) AND (:minListingDate IS NULL OR listing_date > :minListingDate)")
+    LiveData<List<RealEstate>> filterRealEstates(Date maxSaleDate, Date minListingDate, int maxPrice, int minPrice, int  maxSurface, int minSurface);
+
 
 }
 

@@ -9,6 +9,7 @@ import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 import com.openclassrooms.realestatemanager.repositories.RealEstateMediaRepo;
 import com.openclassrooms.realestatemanager.repositories.RealEstateRepo;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -44,6 +45,13 @@ public class RealEstateViewModel extends ViewModel {
 
     public void createOrUpdateRealEstateMedia(RealEstateMedia media) {
         mExecutor.execute(() -> mRealEstateMediaRepo.addRealEstateMedia(media) );
+    }
+
+    public LiveData<List<RealEstate>> filterEstates(Date maxSaleDate, Date minListingDate, int maxPrice, int minPrice, int  maxSurface, int minSurface)
+    {
+
+        return mRealEstateRepo.filterRealEstates(maxSaleDate,minListingDate,maxPrice,minPrice,maxSurface,minSurface);
+
     }
 
 

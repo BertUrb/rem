@@ -38,5 +38,13 @@
     <string name="error_delete_not_supported">Delete operation is not supported</string>
     <string name="error_update_not_supported">Update operation is not supported</string>
     <string name="error_fail_query_row_from_uri">Failed to query row for uri  %s</string>
+    <string name="choose_the_surface_range_m">Choose the surface range (m²)</string>
+    <string name="choose_the_price_range">Choose the price range</string>
+    <string name="weeks_since_listed">Enter the number of weeks since the property was listed:</string>
+    <string name="weeks_since_sold">Enter number of weeks since sold :</string>
+    <string name="surface_values">%s - %s m²</string>
+    <string name="price_values">%s - %s $</string>
+    <string name="unfilter_bt_text">Remove all filters</string>
+    <string name="search">Search</string>
 
 </resources>

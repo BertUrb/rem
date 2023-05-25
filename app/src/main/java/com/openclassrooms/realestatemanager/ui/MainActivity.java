@@ -1,14 +1,26 @@
 package com.openclassrooms.realestatemanager.ui;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -25,21 +37,133 @@ import com.openclassrooms.realestatemanager.model.RealEstate;
 import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding mBinding;
+    private boolean filtered = false;
     private final List<RealEstate> mEstates = new ArrayList<>();
+    private RealEstate mEstate;
     private RealEstateViewModel mRealEstateViewModel;
+
+
+    private final ActivityResultLauncher<Intent> mEditRealEstateLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                            RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
+                            mRealEstateViewModel.createOrUpdateRealEstate(editedEstate);
+
+
+                        }
+                    });
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+        MenuItem searchMenuItem = menu.findItem(R.id.menu_search_button);
+
+        if(filtered)
+        {
+
+            searchMenuItem.setIcon(R.drawable.baseline_close_24);
+
+        }
+        else
+            searchMenuItem.setIcon(R.drawable.baseline_search_24);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent = new Intent(this, RealEstateEditor.class);
+
+        switch (item.getOrder()) {
+            case 1 : // edit
+                intent.putExtra("REAL_ESTATE",mEstate);
+                mEditRealEstateLauncher.launch(intent);
+
+                break;
+            case 2 : // new
+                mEditRealEstateLauncher.launch(intent);
+                break;
+
+            case 3 : //sell
+                Calendar cal = Calendar.getInstance();
+                DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+                    cal.set(year,month, dayOfMonth);
+                    mEstate.setSaleDate(cal.getTime());
+                    mRealEstateViewModel.createOrUpdateRealEstate(mEstate);
+                }, cal.get(Calendar.YEAR),cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+                datePickerDialog.show();
+                break;
+            case 4 : //search
+
+
+                if(filtered) {
+                   startActivity(new Intent(this, MainActivity.class));
+                }
+                else {
+                    SearchModal searchModal = new SearchModal();
+                    searchModal.show(getSupportFragmentManager(), "searchModal");
+
+
+                }
+
+                break;
+
+            case 5 : // map
+                if(Utils.isInternetAvailable(this)){
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, 10);
+                    }
+                    else {
+                        Intent mapActivityIntent = new Intent(this, MapActivity.class);
+                        startActivity(mapActivityIntent);
+                    }
+                }
+                else {
+                    Toast.makeText(this,getString(R.string.internet_is_required),Toast.LENGTH_LONG).show();
+                }
+                break;
+
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         mRealEstateViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this)).get(RealEstateViewModel.class);
-        mRealEstateViewModel.getRealEstates().observe(this, this::getEstatesObserver);
+
+
+
+        Intent intent = getIntent();
+
+
+        Log.d("TAG", "onCreate: " + intent.getParcelableArrayListExtra("filteredEstates") + "<= Intent");
+
+        if(intent.getParcelableArrayListExtra("filteredEstates") != null)
+        {
+            mEstates.clear();
+            mEstates.addAll(intent.getParcelableArrayListExtra("filteredEstates"));
+            Log.d("TAG", "FILTERED ");
+            updateEstates();
+            filtered = true;
+        }
+        else {
+            mRealEstateViewModel.getRealEstates().observe(this, this::getEstatesObserver);
+            filtered = false;
+            Log.d("TAG", "PAS FILTERED ");
+        }
 
     }
 
@@ -126,33 +250,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
+
+
     private void updateEstates() {
         OnRealEstateClickListener onRealEstateClickListener = position -> {
-            RealEstate realEstate = mEstates.get(position);
+            mEstate = mEstates.get(position);
 
 
             if (mBinding.detailViewContainer.getVisibility() == View.VISIBLE) {
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("REAL_ESTATE", realEstate);
+                bundle.putParcelable("REAL_ESTATE", mEstate);
+                DetailsFragment fragment = new DetailsFragment();
 
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                DetailsFragment fragment = new DetailsFragment();
                 fragment.setArguments(bundle);
                 int color = Color.BLUE;
-                String title = realEstate.getName();
-                if (realEstate.getSaleDate() != null) {
+                String title = mEstate.getName();
+                if (mEstate.getSaleDate() != null) {
                     color = Color.RED;
-                    title += " " + getString(R.string.sold, realEstate.getSaleDate());
+                    title += " " + getString(R.string.sold, mEstate.getSaleDate());
                 }
                 Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(color));
                 getSupportActionBar().setTitle(title);
 
+
                 transaction.replace(mBinding.FragmentContainer.getId(), fragment);
                 transaction.commit();
 
+
             } else {
                 Intent intent = new Intent(this, SupportActivity.class);
-                intent.putExtra("REAL_ESTATE", realEstate);
+                intent.putExtra("REAL_ESTATE", mEstate);
                 startActivity(intent);
 
             }
@@ -171,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
             detailViewContainer.setVisibility(View.GONE);
 
         }
+
 
         setContentView(mBinding.getRoot());
         SyncDB();

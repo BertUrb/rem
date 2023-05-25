@@ -118,64 +118,6 @@ public class DetailsFragment extends Fragment{
     ActivityDetailsBinding mBinding;
 
     private RealEstateViewModel mRealEstateViewModel;
-    private final ActivityResultLauncher<Intent> mEditRealEstateLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                    result -> {
-                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                            RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
-                            mRealEstateViewModel.createOrUpdateRealEstate(editedEstate);
-
-
-                        }
-                    });
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Intent intent = new Intent(getContext(), RealEstateEditor.class);
-
-        switch (item.getOrder()) {
-            case 1 : // edit
-                intent.putExtra("REAL_ESTATE",mEstate);
-                mEditRealEstateLauncher.launch(intent);
-
-                break;
-            case 2 : // new
-                mEditRealEstateLauncher.launch(intent);
-                break;
-
-            case 3 : //sell
-                Calendar cal = Calendar.getInstance();
-                DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
-                    cal.set(year,month, dayOfMonth);
-                    mEstate.setSaleDate(cal.getTime());
-                    mRealEstateViewModel.createOrUpdateRealEstate(mEstate);
-                }, cal.get(Calendar.YEAR),cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
-                datePickerDialog.show();
-                break;
-            case 4 : //search
-                SearchModal searchModal = new SearchModal();
-                searchModal.show(getParentFragmentManager(), "searchModal");
-                break;
-
-            case 5 : // map
-                if(Utils.isInternetAvailable(requireContext())){
-                    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(requireActivity(), new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, 10);
-                    }
-                    else {
-                        Intent mapActivityIntent = new Intent(requireContext(), MapActivity.class);
-                        startActivity(mapActivityIntent);
-                    }
-                }
-                else {
-                    Toast.makeText(requireContext(),requireContext().getString(R.string.internet_is_required),Toast.LENGTH_LONG).show();
-                }
-                break;
-
-
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -183,14 +125,6 @@ public class DetailsFragment extends Fragment{
         setHasOptionsMenu(true);
     }
 
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-
-        inflater.inflate(R.menu.main_menu,menu);
-
-        super.onCreateOptionsMenu(menu, inflater);
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -207,7 +141,7 @@ public class DetailsFragment extends Fragment{
         mBinding.rooms.setText(getString(R.string.number_of_rooms,mEstate.getRooms()));
         mBinding.agentTextView.setText(getString(R.string.agent, Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName()));
 
-        //MAP
+        Log.d("TAG", "onCreateView: " + mEstate.toString());
 
 
         return mBinding.getRoot();
