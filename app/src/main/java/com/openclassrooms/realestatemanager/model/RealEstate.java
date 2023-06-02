@@ -3,6 +3,7 @@ package com.openclassrooms.realestatemanager.model;
 import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -13,10 +14,12 @@ import androidx.room.PrimaryKey;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @Entity
@@ -56,6 +59,8 @@ public class RealEstate implements Parcelable {
         mLocation = in.readString();
         mDescription = in.readString();
         mFeaturedMediaUrl = in.readString();
+        byte tmpIsSync = in.readByte();
+        isSync = tmpIsSync == 0 ? null : tmpIsSync == 1;
         mAgentName = in.readString();
         mPrice = in.readInt();
         mSurface = in.readInt();
@@ -63,6 +68,65 @@ public class RealEstate implements Parcelable {
         mBathrooms = in.readInt();
         mBedrooms = in.readInt();
         mMediaList = in.createTypedArrayList(RealEstateMedia.CREATOR);
+
+        long l = in.readLong();
+        if(l != 0) {
+            mSaleDate = new Date(l);
+            Log.d("TAG", "read: " + mSaleDate);
+        }
+        else {
+            mSaleDate = null;
+        }
+        l = in.readLong();
+        if(l != 0) {
+            mListingDate = new Date(l);
+        }
+        else {
+            mListingDate = null;
+        }
+
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(mID);
+        dest.writeString(mName);
+        dest.writeString(mJsonPoint);
+        dest.writeString(mRegion);
+        dest.writeString(mLocation);
+        dest.writeString(mDescription);
+        dest.writeString(mFeaturedMediaUrl);
+        dest.writeByte((byte) (isSync == null ? 0 : isSync ? 1 : 2));
+        dest.writeString(mAgentName);
+        dest.writeInt(mPrice);
+        dest.writeInt(mSurface);
+        dest.writeInt(mRooms);
+        dest.writeInt(mBathrooms);
+        dest.writeInt(mBedrooms);
+        dest.writeTypedList(mMediaList);
+        if(mSaleDate == null)
+        {
+            dest.writeLong(0);
+
+        }
+        else {
+            Log.d("TAG", "writeToParcel: " + mSaleDate);
+            dest.writeLong(mSaleDate.getTime());
+        }
+
+        if (mListingDate != null)
+        {
+            dest.writeLong(mListingDate.getTime());
+        }
+        else {
+            dest.writeLong(0);
+        }
+
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<RealEstate> CREATOR = new Creator<RealEstate>() {
@@ -109,11 +173,11 @@ public class RealEstate implements Parcelable {
 
 
 
-    @Ignore
+
     public RealEstate() {
         // require empty constructor
     }
-
+    @Ignore
     public RealEstate(long mID, String name, String region, String location, String description, int price, int surface, int rooms, int bathrooms, int bedrooms, String featuredMediaUrl, String agentName) {
         this.mID = mID;
         mName = name;
@@ -282,33 +346,11 @@ public class RealEstate implements Parcelable {
         mPrice = priceInDollar;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(@NonNull Parcel parcel, int i) {
-        parcel.writeLong(mID);
-        parcel.writeString(mName);
-        parcel.writeString(mJsonPoint);
-        parcel.writeString(mRegion);
-        parcel.writeString(mLocation);
-        parcel.writeString(mDescription);
-        parcel.writeString(mFeaturedMediaUrl);
-        parcel.writeString(mAgentName);
-        parcel.writeInt(mPrice);
-        parcel.writeInt(mSurface);
-        parcel.writeInt(mRooms);
-        parcel.writeInt(mBathrooms);
-        parcel.writeInt(mBedrooms);
-        parcel.writeTypedList(mMediaList);
-    }
-
     public HashMap<String, Object> toHashMap() {
         HashMap<String, Object> map = new HashMap<>();
 
         map.put("listingDate", mListingDate);
+        map.put("saleDate",mSaleDate);
         map.put("name", mName);
         map.put("jsonPoint", mJsonPoint);
         map.put("region", mRegion);
@@ -398,5 +440,6 @@ public class RealEstate implements Parcelable {
 
         return estate;
     }
+
 }
 

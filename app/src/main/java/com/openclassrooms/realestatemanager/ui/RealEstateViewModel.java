@@ -47,10 +47,10 @@ public class RealEstateViewModel extends ViewModel {
         mExecutor.execute(() -> mRealEstateMediaRepo.addRealEstateMedia(media) );
     }
 
-    public LiveData<List<RealEstate>> filterEstates(Date maxSaleDate, Date minListingDate, int maxPrice, int minPrice, int  maxSurface, int minSurface)
+    public LiveData<List<RealEstate>> filterEstates(String name,Date maxSaleDate, Date minListingDate, int maxPrice, int minPrice, int  maxSurface, int minSurface)
     {
 
-        return mRealEstateRepo.filterRealEstates(maxSaleDate,minListingDate,maxPrice,minPrice,maxSurface,minSurface);
+        return mRealEstateRepo.filterRealEstates(name,maxSaleDate,minListingDate,maxPrice,minPrice,maxSurface,minSurface);
 
     }
 

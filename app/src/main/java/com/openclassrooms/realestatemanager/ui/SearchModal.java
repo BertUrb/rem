@@ -46,6 +46,8 @@ public class SearchModal extends DialogFragment {
     private EditText soldWeeksEditText;
     private Button searchButton;
 
+    private EditText estateNameSearchEditText;
+
     public SearchModal() {
         // Required empty public constructor
     }
@@ -67,13 +69,20 @@ public class SearchModal extends DialogFragment {
         dialogView.setPadding(16, 16, 16, 16);
 
         // Add a range seek bar to select the surface range
+        TextView estateNameTextView = new TextView(getActivity());
+        estateNameTextView.setText(R.string.estate_name_search_text_view);
+        dialogView.addView(estateNameTextView);
 
+        estateNameSearchEditText = new EditText(getActivity());
+        estateNameSearchEditText.setHint(R.string.search_name_hint);
+        estateNameSearchEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+        dialogView.addView(estateNameSearchEditText);
 
-        TextView surfaceSeekBarTextView = new TextView(requireContext());
+        TextView surfaceSeekBarTextView = new TextView(getActivity());
         surfaceSeekBarTextView.setText(R.string.choose_the_surface_range_m);
         dialogView.addView(surfaceSeekBarTextView);
 
-        surfaceSeekBar = new RangeSeekBar<>(requireContext());
+        surfaceSeekBar = new RangeSeekBar<>(getActivity());
         surfaceSeekBar.setRangeValues(10000, 1000000);
         surfaceSeekBar.setSelectedMinValue(10000);
         surfaceSeekBar.setSelectedMaxValue(1000000);
@@ -91,7 +100,7 @@ public class SearchModal extends DialogFragment {
 
         // Add a range seek bar to select the price range
 
-        TextView priceSeekBarTextView = new TextView(requireContext());
+        TextView priceSeekBarTextView = new TextView(getActivity());
         priceSeekBarTextView.setText(R.string.choose_the_price_range);
         dialogView.addView(priceSeekBarTextView);
         priceSeekBar = new RangeSeekBar<>(requireContext());
@@ -115,7 +124,7 @@ public class SearchModal extends DialogFragment {
         priceSeekBar.setOnRangeSeekBarChangeListener((bar, minValue, maxValue) -> priceSeekBarValuesTextView.setText(getString(R.string.price_values,numberFormat.format(minValue),numberFormat.format(maxValue))));
         priceSeekBar.setNotifyWhileDragging(true);
         // Add edit texts for the listed and sold weeks
-        TextView listedWeeksTextView = new TextView(requireContext());
+        TextView listedWeeksTextView = new TextView(getActivity());
         listedWeeksTextView.setText(R.string.weeks_since_listed);
         dialogView.addView(listedWeeksTextView);
         listedWeeksEditText = new EditText(getActivity());
@@ -143,6 +152,9 @@ public class SearchModal extends DialogFragment {
             int maxSurface = surfaceSeekBar.getSelectedMaxValue();
             int minPrice = priceSeekBar.getSelectedMinValue();
             int maxPrice = priceSeekBar.getSelectedMaxValue();
+
+            String name= estateNameSearchEditText.getText().toString();
+
             int listedWeeks;
             if(listedWeeksEditText.getText().toString().equals(""))
             {
@@ -156,7 +168,7 @@ public class SearchModal extends DialogFragment {
             else soldWeeks = Integer.parseInt(soldWeeksEditText.getText().toString());
 
 
-            performSearch(minSurface, maxSurface, minPrice, maxPrice, listedWeeks, soldWeeks);
+            performSearch(name,minSurface, maxSurface, minPrice, maxPrice, listedWeeks, soldWeeks);
 
             // Dismiss the dialog
             dismiss();
@@ -168,7 +180,7 @@ public class SearchModal extends DialogFragment {
         return builder.create();
     }
 
-    private void performSearch(int minSurface, int maxSurface, int minPrice, int maxPrice, int listedWeeks, int soldWeeks) {
+    private void performSearch(String name,int minSurface, int maxSurface, int minPrice, int maxPrice, int listedWeeks, int soldWeeks) {
         RealEstateViewModel mRealEstateViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(requireContext())).get(RealEstateViewModel.class);
 
         Calendar calendar = Calendar.getInstance(), calendar1 = Calendar.getInstance();
@@ -182,7 +194,7 @@ public class SearchModal extends DialogFragment {
         if(listedWeeks != 0)
             minListingDate = calendar1.getTime();
 
-        mRealEstateViewModel.filterEstates(maxSaleDate,minListingDate,maxPrice,minPrice,maxSurface,minSurface).observe(this, realEstates -> {
+        mRealEstateViewModel.filterEstates(name,maxSaleDate,minListingDate,maxPrice,minPrice,maxSurface,minSurface).observe(this, realEstates -> {
             Intent intent = new Intent(requireContext(), MainActivity.class);
 
             Log.d("TAG", "performSearch: " + realEstates );

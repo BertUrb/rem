@@ -144,12 +144,7 @@ public class MainActivity extends AppCompatActivity {
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         mRealEstateViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance(this)).get(RealEstateViewModel.class);
 
-
-
         Intent intent = getIntent();
-
-
-        Log.d("TAG", "onCreate: " + intent.getParcelableArrayListExtra("filteredEstates") + "<= Intent");
 
         if(intent.getParcelableArrayListExtra("filteredEstates") != null)
         {
@@ -250,10 +245,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
     private void updateEstates() {
         OnRealEstateClickListener onRealEstateClickListener = position -> {
             mEstate = mEstates.get(position);
@@ -294,8 +285,13 @@ public class MainActivity extends AppCompatActivity {
         ScrollView detailViewContainer = mBinding.detailViewContainer;
         if (Utils.isDeviceTablet(getApplicationContext())) {
             detailViewContainer.setVisibility(View.VISIBLE);
-            onRealEstateClickListener.OnRealEstateClick(0);
+            if(!mEstates.isEmpty()) {
+                mBinding.noResultsTextView.setVisibility(View.GONE);
+                onRealEstateClickListener.OnRealEstateClick(0);
 
+            } else {
+                mBinding.noResultsTextView.setVisibility(View.VISIBLE);
+            }
 
         } else {
             detailViewContainer.setVisibility(View.GONE);

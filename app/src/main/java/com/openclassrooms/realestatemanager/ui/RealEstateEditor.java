@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -99,6 +100,17 @@ public class RealEstateEditor extends AppCompatActivity {
 
                 if(mRealEstate != null) {
                     realEstate.setID(mRealEstate.getID());
+
+                    Log.d("TAG", "onCreate: " + mRealEstate.getSaleDate());
+
+                    if(mRealEstate.getSaleDate() != null)
+                    {
+                        realEstate.setSaleDate(mRealEstate.getSaleDate());
+
+                    }
+                    if(mRealEstate.getListingDate() != null){
+                        realEstate.setListingDate(mRealEstate.getListingDate());
+                    }
                 }
 
             Intent resultIntent = new Intent();

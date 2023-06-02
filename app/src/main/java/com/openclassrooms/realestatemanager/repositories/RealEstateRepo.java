@@ -24,7 +24,7 @@ public class RealEstateRepo {
 
     }
 
-    public LiveData<List<RealEstate>> filterRealEstates(Date maxSaleDate, Date minListingDate, int maxPrice, int minPrice, int maxSurface, int minSurface) {
-        return mRealEstateDao.filterRealEstates(maxSaleDate,minListingDate,maxPrice,minPrice,maxSurface,minSurface);
+    public LiveData<List<RealEstate>> filterRealEstates(String name,Date maxSaleDate, Date minListingDate, int maxPrice, int minPrice, int maxSurface, int minSurface) {
+        return mRealEstateDao.filterRealEstates(name,maxSaleDate,minListingDate,maxPrice,minPrice,maxSurface,minSurface);
     }
 }
