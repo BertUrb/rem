@@ -12,6 +12,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -136,9 +138,6 @@ public class RealEstateEditor extends AppCompatActivity {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 photoOrGalleryDialog();
-            } else {
-                // permission denied, boo! Disable the functionality that depends on this permission.
-                //Todo
             }
 
         }
@@ -148,7 +147,15 @@ public class RealEstateEditor extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         intent.setType("image/*");
-        startActivityForResult(Intent.createChooser(intent, "Select Images"), REQUEST_CODE_PICK_IMAGES);
+
+        ActivityResultLauncher<Intent> pickImagesLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        onActivityResult(REQUEST_CODE_PICK_IMAGES,Activity.RESULT_OK,result.getData());
+                    }
+                });
+        pickImagesLauncher.launch(Intent.createChooser(intent, "Select Images"));
     }
     private void photoOrGalleryDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -164,10 +171,22 @@ public class RealEstateEditor extends AppCompatActivity {
     }
 
     private void takePhoto() {
+        ActivityResultLauncher<Intent> takePictureLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // Handle the result of the picture capture here
+
+                        onActivityResult(REQUEST_IMAGE_CAPTURE,Activity.RESULT_OK,result.getData());
+
+                    }
+                });
+
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            takePictureLauncher.launch(takePictureIntent);
         }
+
     }
 
     @Override

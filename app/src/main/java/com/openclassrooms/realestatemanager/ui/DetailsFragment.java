@@ -1,26 +1,14 @@
 package com.openclassrooms.realestatemanager.ui;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.DatePickerDialog;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
@@ -41,7 +29,6 @@ import com.mapbox.search.SearchOptions;
 import com.mapbox.search.SearchSelectionCallback;
 import com.mapbox.search.result.SearchResult;
 import com.mapbox.search.result.SearchSuggestion;
-import android.Manifest;
 import com.openclassrooms.realestatemanager.MediaGalleryAdapter;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.SaveImageTask;
@@ -54,7 +41,6 @@ import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 

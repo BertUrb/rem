@@ -1,11 +1,12 @@
 package com.openclassrooms.realestatemanager.ui;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -87,8 +88,8 @@ public class MapFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mEstate = (RealEstate) getArguments().get(sEstate);
-            mEstates = (List<RealEstate>) getArguments().get(sEstate + "S");
+            mEstate = getArguments().getParcelable(sEstate);
+            mEstates = getArguments().getParcelableArrayList(sEstate + "S");
         }
     }
 
@@ -156,7 +157,10 @@ public class MapFragment extends Fragment {
 
 
         Marker marker = new Marker(mMap);
-        Configuration.getInstance().load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()));
+        String sharedPreferencesName = "my_shared_prefs";
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE);
+
+        Configuration.getInstance().load(requireContext(), sharedPreferences);
         marker.setPosition(mCenterPoint);
         if (mEstate != null) {
             marker.setTitle(mEstate.getName());

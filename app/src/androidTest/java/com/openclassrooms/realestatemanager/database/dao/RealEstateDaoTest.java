@@ -1,14 +1,16 @@
 package com.openclassrooms.realestatemanager.database.dao;
 
+import static androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.database.Cursor;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.room.Room;
+import androidx.test.core.app.ApplicationProvider;
 
+import com.openclassrooms.realestatemanager.TestLifecycleOwner;
+import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.model.RealEstate;
 
 import junit.framework.TestCase;
@@ -17,84 +19,72 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+
 public class RealEstateDaoTest extends TestCase {
 
     private RealEstateDao dao;
+    private SaveRealEstateDB testDb;
+    private final TestLifecycleOwner lifecycleOwner = new TestLifecycleOwner();
 
-    public void testGetAllRealEstate() {
-        MutableLiveData<List<RealEstate>> mockLiveData = new MutableLiveData<>();
-        List<RealEstate> mockRealEstates = new ArrayList<>();
-        // Add some mock data to the list
-        mockRealEstates.add(new RealEstate());
-        mockRealEstates.add(new RealEstate());
-        mockLiveData.postValue(mockRealEstates);
+    public void testGetAllRealEstate() throws Throwable {
+        runOnUiThread(() -> dao.getAllRealEstate().observe(lifecycleOwner, realEstates -> assertEquals(5,realEstates.size())));
 
-        // Mock the behavior of the DAO method
-        when(dao.getAllRealEstate()).thenReturn(mockLiveData);
-
-        // Call the method to get all real estates
-
-        LiveData<List<RealEstate>> resultLiveData = dao.getAllRealEstate();
-
-        // Verify the result
-        assertNotNull(resultLiveData.getValue());
-        assertEquals(2, resultLiveData.getValue().size());
     }
 
-    public void testCreateOrUpdateRealEstate() {
+    public void testCreateOrUpdateRealEstate() throws Throwable {
         // Create a mock RealEstate object
         RealEstate mockRealEstate = new RealEstate();
+        dao.createOrUpdateRealEstate(mockRealEstate);
 
         // Mock the behavior of the DAO method
-        when(dao.createOrUpdateRealEstate(mockRealEstate)).thenReturn(1L);
+        runOnUiThread(() -> {
+            dao.getAllRealEstate().observe(lifecycleOwner,realEstates -> assertEquals(6,realEstates.size()));
+        });
 
-        // Call the method to create or update a real estate
-        long result = dao.createOrUpdateRealEstate(mockRealEstate);
-
-        // Verify the result
-        assertEquals(1L, result);
     }
 
-    public void testDeleteRealEstate() {
+    public void testDeleteRealEstate() throws Throwable {
         RealEstate mockRealEstate = new RealEstate();
+        mockRealEstate.setID(1L);
 
-        // Mock the behavior of the DAO method
-        when(dao.deleteRealEstate(mockRealEstate)).thenReturn(1);
+       dao.deleteRealEstate(mockRealEstate);
 
-        // Call the method to delete a real estate
-        int result = dao.deleteRealEstate(mockRealEstate);
-
-        // Verify the result
-        assertEquals(1, result);
+        runOnUiThread(() -> {
+            dao.getAllRealEstate().observe(lifecycleOwner,realEstates -> assertEquals(4,realEstates.size()));
+        });
     }
 
-    public void testInsertMultipleRealEstates() {
-        List<RealEstate> mockRealEstates = new ArrayList<>();
-        mockRealEstates.add(new RealEstate());
-        mockRealEstates.add(new RealEstate());
+    public void testInsertMultipleRealEstates() throws Throwable {
+        List<RealEstate> estates = new ArrayList<>();
+        estates.add(new RealEstate());
+        estates.add(new RealEstate());
 
         // Call the method to insert multiple real estates
-        dao.insertMultipleRealEstates(mockRealEstates);
+        dao.insertMultipleRealEstates(estates);
 
-        // Verify the behavior using Mockito's verify() method
-        verify(dao).insertMultipleRealEstates(mockRealEstates);
+        runOnUiThread(() -> {
+            dao.getAllRealEstate().observe(lifecycleOwner,realEstates -> assertEquals(7,realEstates.size()));
+        });
+
     }
 
-    public void testGetRealEstateWithCursor() {
-        Cursor mockCursor = mock(Cursor.class);
+    public void testGetRealEstateWithCursor() throws Throwable {
 
-        // Mock the behavior of the DAO method
-        when(dao.getRealEstateWithCursor(1L)).thenReturn(mockCursor);
 
-        // Call the method to get real estate with cursor
-        Cursor resultCursor = dao.getRealEstateWithCursor(1L);
+        runOnUiThread(() -> {
+            dao.getAllRealEstate().observe(lifecycleOwner,realEstates -> {
+                assertEquals(5,realEstates.size());
+                Cursor res = dao.getRealEstateWithCursor(realEstates.get(0).getID());
+                assertEquals(realEstates.get(0).getID(),res.getLong(res.getColumnIndex("mID")));
+            });
+        });
 
-        // Verify the result
-        assertNotNull(resultCursor);
-        assertEquals(mockCursor, resultCursor);
+
+
     }
 
-    public void testFilterRealEstates() {
+    public void testFilterRealEstates() throws Throwable {
         // Create mock input parameters
         String name = "example";
         Date maxSaleDate = new Date();
@@ -105,25 +95,19 @@ public class RealEstateDaoTest extends TestCase {
         int maxSurface = 2000;
         int minSurface = 1000;
 
-        // Create a mock LiveData object
-        MutableLiveData<List<RealEstate>> mockLiveData = new MutableLiveData<>();
-        List<RealEstate> mockFilteredRealEstates = new ArrayList<>();
-        // Add some mock filtered data to the list
-        mockFilteredRealEstates.add(new RealEstate());
-        mockFilteredRealEstates.add(new RealEstate());
-        mockLiveData.postValue(mockFilteredRealEstates);
 
-        // Mock the behavior of the DAO method
-        when(dao.filterRealEstates(name, maxSaleDate, minListingDate, maxPrice, minPrice, maxSurface, minSurface))
-                .thenReturn(mockLiveData);
 
-        // Call the method to filter real estates
-        LiveData<List<RealEstate>> resultLiveData = dao.filterRealEstates(name, maxSaleDate, minListingDate, maxPrice,
-                minPrice, maxSurface, minSurface);
 
-        // Verify the result
-        assertNotNull(resultLiveData.getValue());
-        assertEquals(2, resultLiveData.getValue().size());
+        runOnUiThread(()-> {
+            dao.filterRealEstates(name, maxSaleDate, minListingDate, maxPrice,
+                    minPrice, maxSurface, minSurface).observe(lifecycleOwner, realEstates -> {
+                assert realEstates != null;
+                assertEquals(1, realEstates.size());
+            });
+        });
+
+
+
 
 
 }
@@ -131,6 +115,21 @@ public class RealEstateDaoTest extends TestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        dao = mock(RealEstateDao.class);
+
+        testDb = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), SaveRealEstateDB.class).build();
+
+        dao = testDb.realEstateDao();
+
+        List<RealEstate> estates = new ArrayList<>();
+
+        estates.add(new RealEstate("example",  "region",  "location",  "description",  "featuredMediaUrl", 60000, 1500, 3, 1, 2, null ));
+        estates.add(new RealEstate("example2",  "region",  "location",  "description",  "featuredMediaUrl", 60000, 1500, 3, 1, 2, null ));
+
+        dao.insertMultipleRealEstates(estates);
+    }
+    @Override
+    protected void tearDown() throws Exception {
+        testDb.close();
+        super.tearDown();
     }
 }

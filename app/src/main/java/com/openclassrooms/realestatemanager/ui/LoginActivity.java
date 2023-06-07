@@ -1,21 +1,21 @@
 package com.openclassrooms.realestatemanager.ui;
 
+import android.content.Intent;
+import android.os.Bundle;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
-import android.os.Bundle;
-
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.openclassrooms.realestatemanager.R;
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.openclassrooms.realestatemanager.Utils;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void launchSignInIntent() {
-        List<AuthUI.IdpConfig> providers = Arrays.asList(
+        List<AuthUI.IdpConfig> providers = Collections.singletonList(
                 new AuthUI.IdpConfig.EmailBuilder().build());
 
 // Create and launch sign-in intent
