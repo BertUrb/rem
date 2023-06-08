@@ -11,11 +11,12 @@ import com.openclassrooms.realestatemanager.repositories.RealEstateMediaRepo;
 import com.openclassrooms.realestatemanager.repositories.RealEstateRepo;
 import com.openclassrooms.realestatemanager.ui.RealEstateViewModel;
 
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class ViewModelFactory implements ViewModelProvider.Factory {
-    private static ViewModelFactory sModelFactory;
+    private static volatile ViewModelFactory sModelFactory;
     private final RealEstateRepo mRealEstateRepo;
     private final RealEstateMediaRepo mRealEstateMediaRepo;
     private final Executor mExecutor;
@@ -42,8 +43,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(RealEstateViewModel.class)) {
-
-            return (T) new RealEstateViewModel(mRealEstateRepo, mRealEstateMediaRepo, mExecutor);
+            return Objects.requireNonNull(modelClass.cast(new RealEstateViewModel(mRealEstateRepo, mRealEstateMediaRepo, mExecutor)));
         }
 
         throw new IllegalArgumentException("Unknown ViewModel class");

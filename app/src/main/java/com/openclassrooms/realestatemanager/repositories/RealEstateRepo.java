@@ -19,8 +19,8 @@ public class RealEstateRepo {
         return mRealEstateDao.getAllRealEstate();
     }
 
-    public long createOrUpdateRealEstate(RealEstate estate) {
-        return mRealEstateDao.createOrUpdateRealEstate(estate);
+    public void createOrUpdateRealEstate(RealEstate estate) {
+        mRealEstateDao.createOrUpdateRealEstate(estate);
 
     }
 

@@ -4,10 +4,6 @@ import android.os.Build;
 import android.view.View;
 import android.widget.EditText;
 
-import androidx.appcompat.widget.TooltipCompat;
-
-import com.bumptech.glide.request.target.ViewTarget;
-
 public class EditTextFocusListener implements View.OnFocusChangeListener{
     @Override
     public void onFocusChange(View view, boolean b) {

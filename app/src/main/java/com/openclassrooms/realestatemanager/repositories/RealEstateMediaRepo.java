@@ -2,7 +2,6 @@ package com.openclassrooms.realestatemanager.repositories;
 
 import androidx.lifecycle.LiveData;
 
-import com.openclassrooms.realestatemanager.database.dao.RealEstateDao;
 import com.openclassrooms.realestatemanager.database.dao.RealEstateMediaDao;
 import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 
@@ -20,12 +19,12 @@ public class RealEstateMediaRepo {
         return mRealEstateMediaDao.getMediaByRealEstateId(realEstateId);
     }
 
-    public long addRealEstateMedia(RealEstateMedia media) {
-        return mRealEstateMediaDao.addMedia(media);
+    public void addRealEstateMedia(RealEstateMedia media) {
+        mRealEstateMediaDao.addMedia(media);
     }
 
-    public int deleteAllMediaByRealEstateID(long realEstateId) {
-        return mRealEstateMediaDao.deleteAllMediaByRealEstateId(realEstateId);
+    public void deleteAllMediaByRealEstateID(long realEstateId) {
+        mRealEstateMediaDao.deleteAllMediaByRealEstateId(realEstateId);
     }
 
 

@@ -27,7 +27,7 @@ public interface RealEstateMediaDao {
     void insertMultipleMedia(List<RealEstateMedia> realEstateMediaList);
 
     @Delete
-    int deleteMedia(RealEstateMedia realEstateMedia);
+    void deleteMedia(RealEstateMedia realEstateMedia);
 
     @Query("DELETE FROM RealEstateMedia WHERE mRealEstateId = :realEstateID")
     int deleteAllMediaByRealEstateId(long realEstateID);

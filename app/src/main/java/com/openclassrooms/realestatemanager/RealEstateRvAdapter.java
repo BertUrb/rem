@@ -17,8 +17,7 @@ import com.openclassrooms.realestatemanager.model.RealEstate;
 import java.util.List;
 
 public class RealEstateRvAdapter extends RecyclerView.Adapter<RealEstateViewHolder> {
-    private List<RealEstate> mRealEstateList;
-    private RealEstateListItemBinding mRealEstateListItemBinding;
+    private final List<RealEstate> mRealEstateList;
     private final OnRealEstateClickListener mOnRealEstateClickListener;
 
     private int selectedPosition = -1;
@@ -33,9 +32,9 @@ public class RealEstateRvAdapter extends RecyclerView.Adapter<RealEstateViewHold
     @NonNull
     @Override
     public RealEstateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        mRealEstateListItemBinding = RealEstateListItemBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false);
+        com.openclassrooms.realestatemanager.databinding.RealEstateListItemBinding realEstateListItemBinding = RealEstateListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         mContext = parent.getContext();
-        return new RealEstateViewHolder(mRealEstateListItemBinding);
+        return new RealEstateViewHolder(realEstateListItemBinding);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class RealEstateRvAdapter extends RecyclerView.Adapter<RealEstateViewHold
         Log.d("TAG", "onBindViewHolder: " + mRealEstateList.get(position).getName());
         holder.getRealEstateName().setText(mRealEstateList.get(position).getName());
         holder.getRealEstateRegion().setText(mRealEstateList.get(position).getRegion());
-        holder.getRealEstatePrice().setText(mRealEstateList.get(position).getPrice() + " €");
+        holder.getRealEstatePrice().setText(mContext.getString(R.string.price,mRealEstateList.get(position).getPrice()));
 
         holder.itemView.setSelected(selectedPosition == position);
         holder.itemView.setBackground(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.item_background_selector));
@@ -54,9 +53,9 @@ public class RealEstateRvAdapter extends RecyclerView.Adapter<RealEstateViewHold
 
         holder.itemView.setOnClickListener(v -> {
             notifyItemChanged(selectedPosition);
-            selectedPosition = position;
-            mOnRealEstateClickListener.OnRealEstateClick(position);
-            notifyItemChanged(position);
+            selectedPosition = holder.getBindingAdapterPosition();
+            mOnRealEstateClickListener.OnRealEstateClick(holder.getBindingAdapterPosition());
+            notifyItemChanged(holder.getBindingAdapterPosition());
 
         });
 

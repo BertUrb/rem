@@ -8,6 +8,8 @@ import android.os.Bundle;
 import com.openclassrooms.realestatemanager.databinding.ActivitySupportBinding;
 import com.openclassrooms.realestatemanager.model.RealEstate;
 
+import java.util.Objects;
+
 public class SupportActivity extends AppCompatActivity {
 
     @Override
@@ -31,20 +33,8 @@ public class SupportActivity extends AppCompatActivity {
             fragment.setArguments(bundle);
 
             transaction.replace(binder.SupportFrame.getId(), fragment);
-            getSupportActionBar().setTitle(realEstate.getName());
+            Objects.requireNonNull(getSupportActionBar()).setTitle(realEstate.getName());
             transaction.commit();
-
-        }
-        else {
-            //map
-           /* MapFragment mapFragment = MapFragment.newInstance(null);
-
-            // Set the layout parameters for the fragment
-
-            transaction.replace(binder.SupportFrame.getId(), mapFragment);
-            getSupportActionBar().setTitle("Map");
-            transaction.commit();
-*/
 
         }
 

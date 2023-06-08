@@ -14,11 +14,14 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @Entity(foreignKeys = @ForeignKey(entity = RealEstate.class,parentColumns = "mID",childColumns = "mRealEstateId"))
 public class RealEstateMedia implements Parcelable {
     @NonNull
-    private String mMediaUrl, mMediaCaption;
+    private final String mMediaUrl;
+    @NonNull
+    private String mMediaCaption;
 
     private long mRealEstateId;
 
@@ -86,17 +89,9 @@ public class RealEstateMedia implements Parcelable {
         return mID;
     }
 
-    public void setID(long ID) {
-        mID = ID;
-    }
-
     @NonNull
     public String getMediaUrl() {
         return mMediaUrl;
-    }
-
-    public void setMediaUrl(@NonNull String mediaUrl) {
-        mMediaUrl = mediaUrl;
     }
 
     @NonNull
@@ -152,9 +147,9 @@ public class RealEstateMedia implements Parcelable {
     public static RealEstateMedia fromQueryDocumentSnapshot(QueryDocumentSnapshot document) {
 
         RealEstateMedia media = new  RealEstateMedia(
-                document.getLong("realEstateId"),
-                document.getString("mediaUrl"),
-                document.getString("mediaCaption"));
+                Objects.requireNonNull(document.getLong("realEstateId")),
+                Objects.requireNonNull(document.getString("mediaUrl")),
+                Objects.requireNonNull(document.getString("mediaCaption")));
 
         media.setSync(true);
 

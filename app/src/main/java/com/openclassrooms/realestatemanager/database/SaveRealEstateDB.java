@@ -3,19 +3,14 @@ package com.openclassrooms.realestatemanager.database;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.openclassrooms.realestatemanager.Utils;
 import com.openclassrooms.realestatemanager.database.dao.RealEstateDao;
 import com.openclassrooms.realestatemanager.database.dao.RealEstateMediaDao;
@@ -86,7 +81,7 @@ public abstract class SaveRealEstateDB extends RoomDatabase {
                                         }
                                     }
                                 } else {
-                                    Log.d("TAG", "Erreur lors de la récupération des documents :", task1.getException());
+                                    Log.d("TAG", "Error while retrieving documents:", task1.getException());
                                 }
                             });
                     estate.setMediaList(mediaList);
@@ -113,7 +108,7 @@ public abstract class SaveRealEstateDB extends RoomDatabase {
     }
 
 
-};
+}
 
 
 

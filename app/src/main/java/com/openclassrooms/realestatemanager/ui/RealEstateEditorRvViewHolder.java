@@ -1,6 +1,5 @@
 package com.openclassrooms.realestatemanager.ui;
 
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -11,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.openclassrooms.realestatemanager.databinding.AddMediaListItemBinding;
 
 public class RealEstateEditorRvViewHolder extends RecyclerView.ViewHolder {
-    private AddMediaListItemBinding mBinding;
+    private final AddMediaListItemBinding mBinding;
 
     public RealEstateEditorRvViewHolder(@NonNull AddMediaListItemBinding binding) {
         super(binding.getRoot());

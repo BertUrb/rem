@@ -3,13 +3,9 @@ package com.openclassrooms.realestatemanager.ui;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.InputType;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -18,10 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.material.slider.RangeSlider;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.model.RealEstate;
@@ -44,7 +38,6 @@ public class SearchModal extends DialogFragment {
     private RangeSeekBar<Integer>  priceSeekBar;
     private EditText listedWeeksEditText;
     private EditText soldWeeksEditText;
-    private Button searchButton;
 
     private EditText estateNameSearchEditText;
 
@@ -82,7 +75,7 @@ public class SearchModal extends DialogFragment {
         surfaceSeekBarTextView.setText(R.string.choose_the_surface_range_m);
         dialogView.addView(surfaceSeekBarTextView);
 
-        surfaceSeekBar = new RangeSeekBar<>(getActivity());
+        surfaceSeekBar = new RangeSeekBar<>(requireActivity());
         surfaceSeekBar.setRangeValues(10000, 1000000);
         surfaceSeekBar.setSelectedMinValue(10000);
         surfaceSeekBar.setSelectedMaxValue(1000000);
@@ -141,7 +134,7 @@ public class SearchModal extends DialogFragment {
         dialogView.addView(soldWeeksEditText);
 
         // Add a button to perform the search
-        searchButton = new Button(getActivity());
+        Button searchButton = new Button(getActivity());
         searchButton.setText(R.string.search);
         dialogView.addView(searchButton);
 
@@ -198,10 +191,14 @@ public class SearchModal extends DialogFragment {
             Intent intent = new Intent(requireContext(), MainActivity.class);
 
             Log.d("TAG", "performSearch: " + realEstates );
-            intent.putParcelableArrayListExtra("filteredEstates",(ArrayList)realEstates);
+            intent.putParcelableArrayListExtra("filteredEstates",toParcelableList(realEstates));
             Log.d("TAG", "performSearch: FILTER ");
             startActivity(intent);
         });
     }
+    private ArrayList<Parcelable> toParcelableList(List<RealEstate> realEstates) {
+        return new ArrayList<>(realEstates);
+    }
+
 }
 

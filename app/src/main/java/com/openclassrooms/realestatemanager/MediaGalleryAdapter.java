@@ -3,11 +3,7 @@ package com.openclassrooms.realestatemanager;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +12,6 @@ import com.bumptech.glide.Glide;
 import com.openclassrooms.realestatemanager.databinding.MediaListItemBinding;
 import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 
-import java.util.ArrayList;
 import java.util.List;
 
     public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHolder> {

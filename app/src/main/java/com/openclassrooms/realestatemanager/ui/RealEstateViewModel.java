@@ -3,7 +3,6 @@ package com.openclassrooms.realestatemanager.ui;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.openclassrooms.realestatemanager.model.RealEstate;
 import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 import com.openclassrooms.realestatemanager.repositories.RealEstateMediaRepo;
@@ -43,10 +42,6 @@ public class RealEstateViewModel extends ViewModel {
             }
         }
 
-    }
-
-    public void createOrUpdateRealEstateMedia(RealEstateMedia media) {
-        mExecutor.execute(() -> mRealEstateMediaRepo.addRealEstateMedia(media) );
     }
 
     public LiveData<List<RealEstate>> filterEstates(String name,Date maxSaleDate, Date minListingDate, int maxPrice, int minPrice, int  maxSurface, int minSurface)

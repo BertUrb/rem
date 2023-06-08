@@ -15,7 +15,6 @@ import java.util.List;
 
 public class RealEstateEditorRvAdapter extends RecyclerView.Adapter<RealEstateEditorRvViewHolder> {
     List<RealEstateMedia> mRealEstateMediaList;
-    private AddMediaListItemBinding mMediaListItemBinding;
     private Context mContext;
 
     public RealEstateEditorRvAdapter(List<RealEstateMedia> realEstateMediaList) {
@@ -25,9 +24,9 @@ public class RealEstateEditorRvAdapter extends RecyclerView.Adapter<RealEstateEd
     @NonNull
     @Override
     public RealEstateEditorRvViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        mMediaListItemBinding = AddMediaListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        com.openclassrooms.realestatemanager.databinding.AddMediaListItemBinding mediaListItemBinding = AddMediaListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         mContext = parent.getContext();
-        return new RealEstateEditorRvViewHolder(mMediaListItemBinding);
+        return new RealEstateEditorRvViewHolder(mediaListItemBinding);
     }
 
     @Override
