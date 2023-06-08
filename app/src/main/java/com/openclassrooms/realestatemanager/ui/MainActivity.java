@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
                                         Log.d("TAG", "MEDIA OK");
 
                                         for (QueryDocumentSnapshot document : task.getResult()) {
-                                            RealEstateMedia media = RealEstateMedia.fromQueryDocumentSnapshot(document,estate.getAgentName().length());
+                                            RealEstateMedia media = RealEstateMedia.fromQueryDocumentSnapshot(document);
                                             Log.d("TAG", "media id: " + media.getID());
 
                                                 mediaList.add(media);
@@ -203,11 +203,12 @@ public class MainActivity extends AppCompatActivity {
                                 });
                                 mEstates.add(estate);
 
+                                updateEstates();
+
                             }
                         }
 
-                        if (mEstates.size() > 0)
-                            updateEstates();
+
                     });
 
 

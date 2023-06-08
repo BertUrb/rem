@@ -64,30 +64,31 @@ public class DetailsFragment extends Fragment{
 
         @Override
         public void onResult(@NonNull SearchSuggestion suggestion, @NonNull SearchResult result, @NonNull ResponseInfo info) {
-            mCenterPoint = result.getCoordinate();
-            mEstate.setJsonPoint(mCenterPoint.toJson());
-            mRealEstateViewModel.createOrUpdateRealEstate(mEstate);
-            List<StaticMarkerAnnotation> staticMarkerAnnotations = new ArrayList<>();
-            staticMarkerAnnotations.add(StaticMarkerAnnotation.builder()
-                    .lnglat(mCenterPoint)
-                    .color(255, 0, 0)
-                    .build());
+            if (getContext() != null) {
+                mCenterPoint = result.getCoordinate();
+                mEstate.setJsonPoint(mCenterPoint.toJson());
+                mRealEstateViewModel.createOrUpdateRealEstate(mEstate);
+                List<StaticMarkerAnnotation> staticMarkerAnnotations = new ArrayList<>();
+                staticMarkerAnnotations.add(StaticMarkerAnnotation.builder()
+                        .lnglat(mCenterPoint)
+                        .color(255, 0, 0)
+                        .build());
 
-            MapboxStaticMap staticMap = MapboxStaticMap.builder()
-                    .accessToken(requireContext().getString(R.string.mapbox_access_token))
-                    .styleId(StaticMapCriteria.STREET_STYLE)
-                    .cameraPoint(mCenterPoint)
-                    .cameraZoom(10)
-                    .width(400)
-                    .height(400)
-                    .retina(true)
-                    .staticMarkerAnnotations(staticMarkerAnnotations)
-                    .build();
-            SaveImageTask saveImageTask = new SaveImageTask(requireContext(),mOnMapCreated);
-            saveImageTask.execute(staticMap.url().toString(),mEstate.getLocation() + ".jpg");
+                MapboxStaticMap staticMap = MapboxStaticMap.builder()
+                        .accessToken(requireContext().getString(R.string.mapbox_access_token))
+                        .styleId(StaticMapCriteria.STREET_STYLE)
+                        .cameraPoint(mCenterPoint)
+                        .cameraZoom(10)
+                        .width(400)
+                        .height(400)
+                        .retina(true)
+                        .staticMarkerAnnotations(staticMarkerAnnotations)
+                        .build();
+                SaveImageTask saveImageTask = new SaveImageTask(requireContext(), mOnMapCreated);
+                saveImageTask.execute(staticMap.url().toString(), mEstate.getLocation() + ".jpg");
 
+            }
         }
-
 
         @Override
         public void onCategoryResult(@NonNull SearchSuggestion suggestion, @NonNull List<SearchResult> results, @NonNull ResponseInfo responseInfo) {
@@ -125,7 +126,7 @@ public class DetailsFragment extends Fragment{
         mBinding.surface.setText(getString(R.string.surface,mEstate.getSurface()));
         mBinding.bathrooms.setText(getString(R.string.number_of_bathrooms,mEstate.getBathrooms()));
         mBinding.rooms.setText(getString(R.string.number_of_rooms,mEstate.getRooms()));
-        mBinding.agentTextView.setText(getString(R.string.agent, Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName()));
+        mBinding.agentTextView.setText(getString(R.string.agent,mEstate.getAgentName()));
 
         Log.d("TAG", "onCreateView: " + mEstate.toString());
 
@@ -137,10 +138,10 @@ public class DetailsFragment extends Fragment{
 
     private void updateMap(File file) {
         if(isAdded()) {
-            Glide.with(requireActivity())
+            requireActivity().runOnUiThread(() -> Glide.with(requireActivity())
                     .load(file)
                     .override(Target.SIZE_ORIGINAL)
-                    .into(mBinding.staticMap);
+                    .into(mBinding.staticMap));
         }
     }
 

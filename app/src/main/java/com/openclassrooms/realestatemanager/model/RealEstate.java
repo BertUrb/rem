@@ -12,6 +12,8 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
@@ -20,7 +22,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 @Entity
 public class RealEstate implements Parcelable {
@@ -374,7 +378,7 @@ public class RealEstate implements Parcelable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RealEstate estate = (RealEstate) o;
-        return getID() == estate.getID();
+        return getName().equals(estate.getName());
     }
 
     @Override
@@ -388,14 +392,19 @@ public class RealEstate implements Parcelable {
         assert agentName != null;
         long id =  Long.parseLong(document.getId().substring(agentName.length()));
 
-        RealEstate realEstate = new RealEstate(id,
+
+
+
+
+        RealEstate realEstate = new RealEstate(
                 document.getString("name"),
                 document.getString("region"), document.getString("location"), document.getString("description"),
+                document.getString("featuredMediaUrl"),
                 document.getLong("price").intValue(),
                 document.getLong("Surface").intValue(),
                  document.getLong("rooms").intValue(), document.getLong("bathrooms").intValue(), document.getLong("bedrooms").intValue(),
-                document.getString("featuredMediaUrl"),
-                agentName);
+                null);
+        realEstate.setAgentName(agentName);
 
         realEstate.setSync(true);
         realEstate.setListingDate(document.getDate("listingDate"));

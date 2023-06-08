@@ -36,9 +36,11 @@ public class RealEstateViewModel extends ViewModel {
     public void createOrUpdateRealEstate(RealEstate estate) {
         mExecutor.execute(() -> mRealEstateRepo.createOrUpdateRealEstate(estate) );
         mExecutor.execute(() -> mRealEstateMediaRepo.deleteAllMediaByRealEstateID(estate.getID()));
-        for (RealEstateMedia media : estate.getMediaList()) {
-            media.setRealEstateId(estate.getID());
-            mExecutor.execute(() -> mRealEstateMediaRepo.addRealEstateMedia(media));
+        if(estate.getMediaList()!= null) {
+            for (RealEstateMedia media : estate.getMediaList()) {
+                media.setRealEstateId(estate.getID());
+                mExecutor.execute(() -> mRealEstateMediaRepo.addRealEstateMedia(media));
+            }
         }
 
     }

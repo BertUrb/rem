@@ -149,9 +149,9 @@ public class RealEstateMedia implements Parcelable {
 
     }
 
-    public static RealEstateMedia fromQueryDocumentSnapshot(QueryDocumentSnapshot document, int agentNameLength) {
-        long id =  Long.parseLong(document.getId().substring(agentNameLength));
-        RealEstateMedia media = new  RealEstateMedia(id,
+    public static RealEstateMedia fromQueryDocumentSnapshot(QueryDocumentSnapshot document) {
+
+        RealEstateMedia media = new  RealEstateMedia(
                 document.getLong("realEstateId"),
                 document.getString("mediaUrl"),
                 document.getString("mediaCaption"));
