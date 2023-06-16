@@ -57,7 +57,7 @@ public class RealEstate implements Parcelable {
         mDescription = in.readString();
         mFeaturedMediaUrl = in.readString();
         byte tmpIsSync = in.readByte();
-        isSync = tmpIsSync == 0 ? null : tmpIsSync == 1;
+        isSync = tmpIsSync == 1;
         mAgentName = in.readString();
         mPrice = in.readInt();
         mSurface = in.readInt();
@@ -93,7 +93,7 @@ public class RealEstate implements Parcelable {
         dest.writeString(mLocation);
         dest.writeString(mDescription);
         dest.writeString(mFeaturedMediaUrl);
-        dest.writeByte((byte) (isSync == null ? 0 : isSync ? 1 : 2));
+        dest.writeByte((byte) (isSync != null && isSync ? 1 : 0));
         dest.writeString(mAgentName);
         dest.writeInt(mPrice);
         dest.writeInt(mSurface);

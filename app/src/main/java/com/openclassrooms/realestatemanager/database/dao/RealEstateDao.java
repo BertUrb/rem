@@ -41,6 +41,8 @@ public interface RealEstateDao {
     LiveData<List<RealEstate>> filterRealEstates(String name, Date maxSaleDate, Date minListingDate, int maxPrice, int minPrice, int maxSurface, int minSurface);
 
 
+    @Query("UPDATE realestate SET mFeaturedMediaUrl=:mediaUrl WHERE mFeaturedMediaUrl=:oldUrl")
+    void updateFeaturedMediaUrl(String oldUrl, String mediaUrl);
 }
 
 

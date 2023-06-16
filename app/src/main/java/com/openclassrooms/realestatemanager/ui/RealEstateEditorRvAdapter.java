@@ -1,6 +1,7 @@
 package com.openclassrooms.realestatemanager.ui;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -34,6 +35,9 @@ public class RealEstateEditorRvAdapter extends RecyclerView.Adapter<RealEstateEd
         Glide.with(mContext)
                 .load(mRealEstateMediaList.get(position).getMediaUrl())
                 .into(holder.getImage());
+
+
+        Log.d("TAG", "onBindViewHolder: " + mRealEstateMediaList.get(position).getMediaUrl());
 
         holder.getCaption().setText(mRealEstateMediaList.get(position).getMediaCaption());
 

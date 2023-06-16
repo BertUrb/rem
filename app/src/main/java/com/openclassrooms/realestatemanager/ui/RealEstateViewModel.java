@@ -1,5 +1,7 @@
 package com.openclassrooms.realestatemanager.ui;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -33,15 +35,25 @@ public class RealEstateViewModel extends ViewModel {
     }
 
     public void createOrUpdateRealEstate(RealEstate estate) {
-        mExecutor.execute(() -> mRealEstateRepo.createOrUpdateRealEstate(estate) );
-        mExecutor.execute(() -> mRealEstateMediaRepo.deleteAllMediaByRealEstateID(estate.getID()));
-        if(estate.getMediaList()!= null) {
-            for (RealEstateMedia media : estate.getMediaList()) {
-                media.setRealEstateId(estate.getID());
-                mExecutor.execute(() -> mRealEstateMediaRepo.addRealEstateMedia(media));
+        mExecutor.execute(()-> {
+            long id = mRealEstateRepo.createOrUpdateRealEstate(estate);
+            Log.d("TAG", "createOrUpdateRealEstate: ID:" + estate.getID() + "id:" + id);
+            mExecutor.execute(() -> mRealEstateMediaRepo.deleteAllMediaByRealEstateID(id));
+            if(estate.getMediaList()!= null) {
+                for (RealEstateMedia media : estate.getMediaList()) {
+                    media.setRealEstateId(id);
+                    mExecutor.execute(() -> mRealEstateMediaRepo.addRealEstateMedia(media));
+                }
             }
-        }
 
+        });
+
+
+
+    }
+
+    public void updateMedia(RealEstateMedia media) {
+        mExecutor.execute( () -> mRealEstateMediaRepo.addRealEstateMedia(media));
     }
 
     public LiveData<List<RealEstate>> filterEstates(String name,Date maxSaleDate, Date minListingDate, int maxPrice, int minPrice, int  maxSurface, int minSurface)
@@ -52,7 +64,7 @@ public class RealEstateViewModel extends ViewModel {
     }
 
 
-
-
-
+    public void updateEstateFeaturedMediaUrl(String oldUrl, String mediaUrl) {
+        mExecutor.execute(()-> mRealEstateRepo.updateFeaturedMediaUrl(oldUrl,mediaUrl));
+    }
 }

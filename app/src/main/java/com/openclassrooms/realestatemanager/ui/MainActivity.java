@@ -30,6 +30,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateRvAdapter;
 import com.openclassrooms.realestatemanager.Utils;
+import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding;
 import com.openclassrooms.realestatemanager.event.OnRealEstateClickListener;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private final List<RealEstate> mEstates = new ArrayList<>();
     private RealEstate mEstate;
     private RealEstateViewModel mRealEstateViewModel;
+
+    private boolean mShouldObserve = true;
 
 
     private final ActivityResultLauncher<Intent> mEditRealEstateLauncher =
@@ -155,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             filtered = true;
         }
         else {
-            mRealEstateViewModel.getRealEstates().observe(this, this::getEstatesObserver);
+            mRealEstateViewModel.getRealEstates().observe(this,this::getEstatesObserver);
             filtered = false;
             Log.d("TAG", "PAS FILTERED ");
         }
@@ -163,16 +166,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkFirestore() {
-        if(Utils.isInternetAvailable(this)) {
+        if(Utils.isInternetAvailable(this) && SaveRealEstateDB.isDatabasePrepopulated(this)) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-
 
             db.collection("estates")
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         Log.d("TAG", "onCreate: DB SUCCESS ");
+
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+
                             List<RealEstateMedia> mediaList = new ArrayList<>();
                             RealEstate estate = RealEstate.fromQueryDocumentSnapshot(documentSnapshot);
                             Log.d("TAG", "QuerySnapshot: " + estate.getName());
@@ -191,8 +194,6 @@ public class MainActivity extends AppCompatActivity {
                                             Log.d("TAG", "media id: " + media.getID());
 
                                                 mediaList.add(media);
-
-
                                         }
                                         estate.setMediaList(mediaList);
                                         mRealEstateViewModel.createOrUpdateRealEstate(estate);
@@ -202,11 +203,13 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
                                 mEstates.add(estate);
+                                mShouldObserve = true;
 
                                 updateEstates();
 
                             }
                         }
+
 
 
                     });
@@ -225,7 +228,8 @@ public class MainActivity extends AppCompatActivity {
                     if (dc.getType() == DocumentChange.Type.ADDED) {
                         RealEstate estate = RealEstate.fromQueryDocumentSnapshot(dc.getDocument());
                         if (!mEstates.contains(estate)) {
-                            mEstates.add(estate);
+                           mEstates.add(estate);
+                            mShouldObserve = true;
                         }
                     }
                 }
@@ -234,14 +238,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     private void getEstatesObserver(List<RealEstate> estates) {
-        mEstates.clear();
-        mEstates.addAll(estates);
+        if(mShouldObserve) {
+            mShouldObserve = false;
+            mEstates.clear();
+            mEstates.addAll(estates);
 
-        if (estates.size() > 0)
-            updateEstates();
+            if (estates.size() > 0)
+                updateEstates();
 
-        checkFirestore();
+            checkFirestore();
+
+
+        }
 
     }
 
@@ -312,9 +322,9 @@ public class MainActivity extends AppCompatActivity {
         SyncDB();
     }
 
-    private void SyncDB() {
 
-        if (Utils.isInternetAvailable(this)) {
+    private void SyncDB() {
+        if (SaveRealEstateDB.isDatabasePrepopulated(this) && Utils.isInternetAvailable(this)) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             for (RealEstate estate : mEstates) {
                 if (!estate.getSync()) {
@@ -328,6 +338,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             }
+
 
         }
     }

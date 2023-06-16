@@ -19,12 +19,16 @@ public class RealEstateRepo {
         return mRealEstateDao.getAllRealEstate();
     }
 
-    public void createOrUpdateRealEstate(RealEstate estate) {
-        mRealEstateDao.createOrUpdateRealEstate(estate);
+    public long createOrUpdateRealEstate(RealEstate estate) {
+        return mRealEstateDao.createOrUpdateRealEstate(estate);
 
     }
 
     public LiveData<List<RealEstate>> filterRealEstates(String name,Date maxSaleDate, Date minListingDate, int maxPrice, int minPrice, int maxSurface, int minSurface) {
         return mRealEstateDao.filterRealEstates(name,maxSaleDate,minListingDate,maxPrice,minPrice,maxSurface,minSurface);
+    }
+
+    public void updateFeaturedMediaUrl(String oldUrl, String mediaUrl) {
+        mRealEstateDao.updateFeaturedMediaUrl(oldUrl,mediaUrl);
     }
 }
