@@ -1,12 +1,20 @@
 package com.openclassrooms.realestatemanager.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -31,12 +39,12 @@ import com.mapbox.search.SearchSelectionCallback;
 import com.mapbox.search.result.SearchResult;
 import com.mapbox.search.result.SearchSuggestion;
 import com.openclassrooms.realestatemanager.MediaGalleryAdapter;
-import com.openclassrooms.realestatemanager.event.OnItemClickListener;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.SaveImageTask;
 import com.openclassrooms.realestatemanager.UploadImageToFirestore;
 import com.openclassrooms.realestatemanager.Utils;
 import com.openclassrooms.realestatemanager.databinding.ActivityDetailsBinding;
+import com.openclassrooms.realestatemanager.event.OnItemClickListener;
 import com.openclassrooms.realestatemanager.event.OnMapCreated;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
 import com.openclassrooms.realestatemanager.model.RealEstate;
@@ -45,6 +53,7 @@ import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -61,6 +70,14 @@ public class DetailsFragment extends Fragment implements OnItemClickListener {
     private RealEstateViewModel mRealEstateViewModel;
     private LiveData<List<RealEstateMedia>> mLiveData;
     private Observer<List<RealEstateMedia>> mObserver;
+    private final ActivityResultLauncher<Intent> mEditRealEstateLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                            RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
+                            mRealEstateViewModel.createOrUpdateRealEstate(editedEstate);
+                        }
+                    });
 
     private final SearchSelectionCallback searchCallback = new SearchSelectionCallback() {
         @Override
@@ -129,6 +146,8 @@ public class DetailsFragment extends Fragment implements OnItemClickListener {
         Bundle bundle = getArguments();
         assert bundle != null;
         mEstate = bundle.getParcelable("REAL_ESTATE");
+
+
         mLiveData = mRealEstateViewModel.getRealEstateMediasByID(mEstate.getID());
         mObserver = this::mediaObserver;
         mLiveData.observe(getViewLifecycleOwner(), mObserver);
@@ -362,6 +381,38 @@ public class DetailsFragment extends Fragment implements OnItemClickListener {
 
 
         });
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if(!Utils.isDeviceTablet(requireContext())) {
+            inflater.inflate(R.menu.edit_menu_phone, menu);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent = new Intent(requireContext(), RealEstateEditor.class);
+
+        switch (item.getOrder()) {
+            case 1: // edit
+                intent.putExtra("REAL_ESTATE", mEstate);
+                mEditRealEstateLauncher.launch(intent);
+                break;
+
+            case 3: //sell
+                Calendar cal = Calendar.getInstance();
+                DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), (view, year, month, dayOfMonth) -> {
+                    cal.set(year, month, dayOfMonth);
+                    mEstate.setSaleDate(cal.getTime());
+                    mRealEstateViewModel.createOrUpdateRealEstate(mEstate);
+                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+                datePickerDialog.show();
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

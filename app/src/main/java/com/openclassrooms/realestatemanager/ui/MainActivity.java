@@ -63,8 +63,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu,menu);
-        MenuItem searchMenuItem = menu.findItem(R.id.menu_search_button);
+        MenuItem searchMenuItem;
+        if(Utils.isDeviceTablet(this)) {
+            getMenuInflater().inflate(R.menu.main_menu_tablet, menu);
+
+        }
+        else {
+            getMenuInflater().inflate(R.menu.main_menu_phone, menu);
+
+        }
+
+        searchMenuItem = menu.findItem(R.id.menu_search_button);
 
         if(filtered)
         {

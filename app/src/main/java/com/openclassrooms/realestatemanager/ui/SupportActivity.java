@@ -3,8 +3,11 @@ package com.openclassrooms.realestatemanager.ui;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.databinding.ActivitySupportBinding;
 import com.openclassrooms.realestatemanager.model.RealEstate;
 
@@ -33,7 +36,16 @@ public class SupportActivity extends AppCompatActivity {
             fragment.setArguments(bundle);
 
             transaction.replace(binder.SupportFrame.getId(), fragment);
-            Objects.requireNonNull(getSupportActionBar()).setTitle(realEstate.getName());
+
+            int color = Color.BLUE;
+            String title = realEstate.getName();
+            if (realEstate.getSaleDate() != null) {
+                color = Color.RED;
+                title += " " + getString(R.string.sold, realEstate.getSaleDate());
+            }
+            Objects.requireNonNull(getSupportActionBar()).setBackgroundDrawable(new ColorDrawable(color));
+            Objects.requireNonNull(getSupportActionBar()).setTitle(title);
+
             transaction.commit();
 
         }
