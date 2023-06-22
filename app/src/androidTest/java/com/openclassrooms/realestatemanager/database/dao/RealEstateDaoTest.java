@@ -1,8 +1,6 @@
 package com.openclassrooms.realestatemanager.database.dao;
 
 import static androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import android.database.Cursor;
 
@@ -38,9 +36,7 @@ public class RealEstateDaoTest extends TestCase {
         dao.createOrUpdateRealEstate(mockRealEstate);
 
         // Mock the behavior of the DAO method
-        runOnUiThread(() -> {
-            dao.getAllRealEstate().observe(lifecycleOwner,realEstates -> assertEquals(6,realEstates.size()));
-        });
+        runOnUiThread(() -> dao.getAllRealEstate().observe(lifecycleOwner, realEstates -> assertEquals(6,realEstates.size())));
 
     }
 
@@ -50,9 +46,7 @@ public class RealEstateDaoTest extends TestCase {
 
        dao.deleteRealEstate(mockRealEstate);
 
-        runOnUiThread(() -> {
-            dao.getAllRealEstate().observe(lifecycleOwner,realEstates -> assertEquals(4,realEstates.size()));
-        });
+        runOnUiThread(() -> dao.getAllRealEstate().observe(lifecycleOwner, realEstates -> assertEquals(4,realEstates.size())));
     }
 
     public void testInsertMultipleRealEstates() throws Throwable {
@@ -63,22 +57,18 @@ public class RealEstateDaoTest extends TestCase {
         // Call the method to insert multiple real estates
         dao.insertMultipleRealEstates(estates);
 
-        runOnUiThread(() -> {
-            dao.getAllRealEstate().observe(lifecycleOwner,realEstates -> assertEquals(7,realEstates.size()));
-        });
+        runOnUiThread(() -> dao.getAllRealEstate().observe(lifecycleOwner, realEstates -> assertEquals(7,realEstates.size())));
 
     }
 
     public void testGetRealEstateWithCursor() throws Throwable {
 
 
-        runOnUiThread(() -> {
-            dao.getAllRealEstate().observe(lifecycleOwner,realEstates -> {
-                assertEquals(5,realEstates.size());
-                Cursor res = dao.getRealEstateWithCursor(realEstates.get(0).getID());
-                assertEquals(realEstates.get(0).getID(),res.getLong(res.getColumnIndex("mID")));
-            });
-        });
+        runOnUiThread(() -> dao.getAllRealEstate().observe(lifecycleOwner, realEstates -> {
+            assertEquals(5,realEstates.size());
+            Cursor res = dao.getRealEstateWithCursor(realEstates.get(0).getID());
+            assertEquals(realEstates.get(0).getID(),res.getLong(res.getColumnIndex("mID")));
+        }));
 
 
 
@@ -98,13 +88,12 @@ public class RealEstateDaoTest extends TestCase {
 
 
 
-        runOnUiThread(()-> {
-            dao.filterRealEstates(name, maxSaleDate, minListingDate, maxPrice,
-                    minPrice, maxSurface, minSurface).observe(lifecycleOwner, realEstates -> {
-                assert realEstates != null;
-                assertEquals(1, realEstates.size());
-            });
-        });
+        runOnUiThread(()-> dao.filterRealEstates(name, maxSaleDate, minListingDate, maxPrice,
+                minPrice, maxSurface, minSurface).observe(lifecycleOwner, realEstates -> {
+            assert realEstates != null;
+            assertEquals(1, realEstates.size());
+            assertEquals("example",realEstates.get(0).getName());
+        }));
 
 
 

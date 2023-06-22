@@ -43,12 +43,10 @@ public class RealEstateMediaDaoTest extends TestCase {
     }
 
     public void testGetMediaByRealEstateIdWithCursor() throws Throwable {
-        runOnUiThread(() -> {
-            dao.getMediaByRealEstateId(1).observe(lifecycleOwner,realEstateMedias -> {
-                Cursor res = dao.getMediaByRealEstateIdWithCursor(1);
-                assertEquals(realEstateMedias.get(0).getID(),res.getLong(res.getColumnIndex("mID")));
-            });
-        });
+        runOnUiThread(() -> dao.getMediaByRealEstateId(1).observe(lifecycleOwner, realEstateMedias -> {
+            Cursor res = dao.getMediaByRealEstateIdWithCursor(1);
+            assertEquals(realEstateMedias.get(0).getID(),res.getLong(res.getColumnIndex("mID")));
+        }));
     }
 
     public void testAddMedia() throws Throwable {
