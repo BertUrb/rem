@@ -1,8 +1,6 @@
 package com.openclassrooms.realestatemanager.ui;
 
-import android.app.Application;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;

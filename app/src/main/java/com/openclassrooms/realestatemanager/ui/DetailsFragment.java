@@ -1,7 +1,6 @@
 package com.openclassrooms.realestatemanager.ui;
 
 import android.annotation.SuppressLint;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,7 +31,7 @@ import com.mapbox.search.SearchSelectionCallback;
 import com.mapbox.search.result.SearchResult;
 import com.mapbox.search.result.SearchSuggestion;
 import com.openclassrooms.realestatemanager.MediaGalleryAdapter;
-import com.openclassrooms.realestatemanager.OnItemClickListener;
+import com.openclassrooms.realestatemanager.event.OnItemClickListener;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.SaveImageTask;
 import com.openclassrooms.realestatemanager.UploadImageToFirestore;
@@ -137,6 +136,7 @@ public class DetailsFragment extends Fragment implements OnItemClickListener {
         mBinding.description.setText(mEstate.getDescription());
         mBinding.surface.setText(getString(R.string.surface, mEstate.getSurface()));
         mBinding.bathrooms.setText(getString(R.string.number_of_bathrooms, mEstate.getBathrooms()));
+        mBinding.bedrooms.setText(getString(R.string.number_of_bedrooms,mEstate.getBedrooms()));
         mBinding.rooms.setText(getString(R.string.number_of_rooms, mEstate.getRooms()));
         mBinding.agentTextView.setText(getString(R.string.agent, mEstate.getAgentName()));
 
@@ -255,7 +255,7 @@ public class DetailsFragment extends Fragment implements OnItemClickListener {
             {
                 mLiveData.removeObservers(getViewLifecycleOwner());
             }
-            Log.d("TAG", "SyncDB: PREPOPULATED " + mEstate);
+            Log.d("TAG", "SyncDB:" + mEstate);
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             if (mEstate != null) {
                 if (!mEstate.getSync()) {
@@ -293,10 +293,9 @@ public class DetailsFragment extends Fragment implements OnItemClickListener {
                                     }
                                     completedMediaCount.getAndIncrement();
 
-                                    // Vérifier si tous les médias ont été synchronisés
                                     if (completedMediaCount.get() == totalMediaCount && !mLiveData.hasActiveObservers()) {
                                         mLiveData.observe(this, mObserver);
-                                        Log.d("TAG", "Tous les ajouts dans Firestore sont terminés.");
+                                        Log.d("TAG", "All medias added to firestore");
                                     }
                                 });
                     }
@@ -304,7 +303,6 @@ public class DetailsFragment extends Fragment implements OnItemClickListener {
 
             }
         }
-        //mLiveData.observe(getViewLifecycleOwner(), mObserver);
     }
 
 

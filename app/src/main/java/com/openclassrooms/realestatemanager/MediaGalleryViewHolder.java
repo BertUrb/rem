@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.openclassrooms.realestatemanager.databinding.MediaListItemBinding;
+import com.openclassrooms.realestatemanager.event.OnItemClickListener;
 
 public class MediaGalleryViewHolder extends RecyclerView.ViewHolder {
     private final MediaListItemBinding mBinding;
@@ -20,6 +21,7 @@ public class MediaGalleryViewHolder extends RecyclerView.ViewHolder {
             if (mOnItemClickListener != null) {
                 MediaGalleryAdapter adapter = (MediaGalleryAdapter) getBindingAdapter();
 
+                assert adapter != null;
                 mOnItemClickListener.onItemClick(adapter.getMediaUrl(getBindingAdapterPosition()));
             }
         });

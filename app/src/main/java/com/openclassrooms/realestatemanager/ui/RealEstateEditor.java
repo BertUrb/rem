@@ -208,6 +208,9 @@ public class RealEstateEditor extends AppCompatActivity {
             if (mRealEstate.getListingDate() != null) {
                 realEstate.setListingDate(mRealEstate.getListingDate());
             }
+            else {
+                realEstate.setListingDate(new Date());
+            }
         }
 
         Intent resultIntent = new Intent();

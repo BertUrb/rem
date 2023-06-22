@@ -1,19 +1,16 @@
 package com.openclassrooms.realestatemanager.ui;
 
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -36,8 +33,13 @@ public class ImageLoader {
             }catch(MalformedURLException ex){
                 File file=new File(imageUrl);
                 if(file.exists()) {
-                    InputStream inputStream = new FileInputStream(file);
-                    return Drawable.createFromStream(inputStream, "image");
+                    try (InputStream inputStream = new FileInputStream(file)) {
+                        return Drawable.createFromStream(inputStream, "image");
+                    }
+                    catch (FileNotFoundException e) {
+                        Log.e("TAG", "loadImage: FILE NOT FOUND ", e);
+
+                    }
                 }
                 return null;
             }

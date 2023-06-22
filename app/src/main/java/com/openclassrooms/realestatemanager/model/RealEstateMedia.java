@@ -13,9 +13,7 @@ import androidx.room.PrimaryKey;
 
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
 @Entity(foreignKeys = @ForeignKey(entity = RealEstate.class,parentColumns = "mID",childColumns = "mRealEstateId"),
@@ -119,24 +117,6 @@ public class RealEstateMedia implements Parcelable {
         mMediaCaption = mediaCaption;
     }
 
-    public static List<RealEstateMedia> getMediaExamples() {
-        List<RealEstateMedia> medias =  new ArrayList<>();
-
-        medias.add(new RealEstateMedia(1,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-1.jpg","Whole house",""));
-        medias.add(new RealEstateMedia(2,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-13.jpg","Play Room",""));
-        medias.add(new RealEstateMedia(3,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-16.jpg","Library",""));
-        medias.add(new RealEstateMedia(4,1,"https://aaronkirman.com/wp-content/uploads/2022/01/The-One-Gallery-24.jpg","Bedroom",""));
-        medias.add(new RealEstateMedia(5,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A5194.jpg","Outside",""));
-        medias.add(new RealEstateMedia(6,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A3878.jpg","Inside 1",""));
-        medias.add(new RealEstateMedia(7,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A3930.jpg","Inside 2",""));
-        medias.add(new RealEstateMedia(8,2,"https://aaronkirman.com/wp-content/uploads/2022/04/163A4070.jpg","Inside 3",""));
-        medias.add(new RealEstateMedia(9,3,"https://aaronkirman.com/wp-content/uploads/2022/01/DJI_0648.jpg","Outside",""));
-        medias.add(new RealEstateMedia(10,3,"https://aaronkirman.com/wp-content/uploads/2022/01/163A0232.jpg","Inside 1",""));
-        medias.add(new RealEstateMedia(11,3,"https://aaronkirman.com/wp-content/uploads/2022/01/163A0320.jpg","Inside 2",""));
-
-        return medias;
-    }
-
     public HashMap<String, Object> toHashMap(String agentName) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("mediaUrl", mFirestoreUrl);
@@ -145,18 +125,6 @@ public class RealEstateMedia implements Parcelable {
 
         return map;
 
-    }
-
-    public static RealEstateMedia fromQueryDocumentSnapshot(QueryDocumentSnapshot document) {
-
-        RealEstateMedia media = new  RealEstateMedia(
-                Objects.requireNonNull(document.getLong("realEstateId")),
-                Objects.requireNonNull(document.getString("mediaUrl")),
-                Objects.requireNonNull(document.getString("mediaCaption")));
-
-        media.setSync(true);
-
-        return media;
     }
 
     public static RealEstateMedia fromQueryDocumentSnapshot(QueryDocumentSnapshot document,String agent) {
