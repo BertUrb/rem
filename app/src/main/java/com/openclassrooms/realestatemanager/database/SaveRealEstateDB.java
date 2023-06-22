@@ -40,8 +40,7 @@ public abstract class SaveRealEstateDB extends RoomDatabase {
         if (INSTANCE == null) {
             synchronized (SaveRealEstateDB.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),  SaveRealEstateDB.class, "MyDatabase.db")
-                            .addCallback(prepopulateDatabase(context))
+                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(), SaveRealEstateDB.class, "MyDatabase.db")
                             .build();
                 }
             }
@@ -69,23 +68,18 @@ public abstract class SaveRealEstateDB extends RoomDatabase {
                             RealEstate estate = RealEstate.fromQueryDocumentSnapshot(document);
                             estate.setID(i.get());
                             List<RealEstateMedia> mediaList = new ArrayList<>();
-                            int id = Integer.parseInt(document.getId().substring(estate.getAgentName().length()));
 
-                            dbFs.collection("medias").whereGreaterThanOrEqualTo(FieldPath.documentId(), estate.getAgentName())
-                                    .whereLessThan(FieldPath.documentId(), estate.getAgentName() + "\uf8ff")
+                            dbFs.collection("medias").whereEqualTo("realEstateId", document.getId())
                                     .get()
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
                                             for (QueryDocumentSnapshot mediaDocument : task1.getResult()) {
-                                                RealEstateMedia media = RealEstateMedia.fromQueryDocumentSnapshot(mediaDocument);
-                                                if (media.getRealEstateId() == id) {
-                                                    media.setRealEstateId(i.get());
-                                                    realEstateMedias.add(media);
-                                                    media.setSync(true);
-                                                    mediaList.add(media);
+                                                RealEstateMedia media = RealEstateMedia.fromQueryDocumentSnapshot(mediaDocument, estate.getAgentName());
+                                                realEstateMedias.add(media);
+                                                mediaList.add(media);
 
-                                                    Log.d("TAG", "prepopulateDatabase: " + media.getMediaUrl());
-                                                }
+                                                Log.d("TAG", "prepopulateDatabase: " + media.getMediaUrl());
+
                                             }
                                         } else {
                                             Log.d("TAG", "Error while retrieving documents:", task1.getException());

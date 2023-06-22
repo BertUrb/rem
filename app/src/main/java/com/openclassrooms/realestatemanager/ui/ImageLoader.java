@@ -5,10 +5,13 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import java.util.concurrent.ExecutorService;
@@ -30,7 +33,15 @@ public class ImageLoader {
                 InputStream inputStream = connection.getInputStream();
                 Log.d("TAG", "loadImage: " + connection.getResponseMessage());
                 return Drawable.createFromStream(inputStream, "image");
-            } catch (IOException e) {
+            }catch(MalformedURLException ex){
+                File file=new File(imageUrl);
+                if(file.exists()) {
+                    InputStream inputStream = new FileInputStream(file);
+                    return Drawable.createFromStream(inputStream, "image");
+                }
+                return null;
+            }
+            catch (IOException e) {
                 Log.d("TAG", "loadImage: BUG");
                 Log.e("TAG", "loadImage: ",e );
                 return null;

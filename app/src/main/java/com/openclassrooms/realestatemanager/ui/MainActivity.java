@@ -30,7 +30,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.RealEstateRvAdapter;
 import com.openclassrooms.realestatemanager.Utils;
-import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.databinding.ActivityMainBinding;
 import com.openclassrooms.realestatemanager.event.OnRealEstateClickListener;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
@@ -59,8 +58,6 @@ public class MainActivity extends AppCompatActivity {
                         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                             RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
                             mRealEstateViewModel.createOrUpdateRealEstate(editedEstate);
-
-
                         }
                     });
 
@@ -71,9 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(filtered)
         {
-
             searchMenuItem.setIcon(R.drawable.baseline_close_24);
-
         }
         else
             searchMenuItem.setIcon(R.drawable.baseline_search_24);
@@ -113,8 +108,6 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     SearchModal searchModal = new SearchModal();
                     searchModal.show(getSupportFragmentManager(), "searchModal");
-
-
                 }
 
                 break;
@@ -166,14 +159,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkFirestore() {
-        if(Utils.isInternetAvailable(this) && SaveRealEstateDB.isDatabasePrepopulated(this)) {
+
+        if(Utils.isInternetAvailable(this)) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
 
             db.collection("estates")
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         Log.d("TAG", "onCreate: DB SUCCESS ");
-
+                        mShouldObserve = false;
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
 
                             List<RealEstateMedia> mediaList = new ArrayList<>();
@@ -182,28 +176,27 @@ public class MainActivity extends AppCompatActivity {
 
                             if (!mEstates.contains(estate)) {
                                 Log.d("TAG", "New estate !! ");
-                               mRealEstateViewModel.createOrUpdateRealEstate(estate);
 
-
-                                db.collection("medias").whereEqualTo("realEstateId",estate.getID()).get().addOnCompleteListener(task -> {
+                                db.collection("medias").whereEqualTo("realEstateId",documentSnapshot.getId()).get().addOnCompleteListener(task -> {
                                     if (task.isSuccessful()) {
                                         Log.d("TAG", "MEDIA OK");
 
                                         for (QueryDocumentSnapshot document : task.getResult()) {
-                                            RealEstateMedia media = RealEstateMedia.fromQueryDocumentSnapshot(document);
-                                            Log.d("TAG", "media id: " + media.getID());
 
-                                                mediaList.add(media);
+                                            RealEstateMedia media = RealEstateMedia.fromQueryDocumentSnapshot(document,estate.getAgentName());
+                                            Log.d("TAG", "media id: " + media.getID());
+                                            mediaList.add(media);
                                         }
                                         estate.setMediaList(mediaList);
                                         mRealEstateViewModel.createOrUpdateRealEstate(estate);
+                                        mShouldObserve = true;
 
                                     } else {
                                         Log.d("TAG", "Error getting documents: ", task.getException());
                                     }
                                 });
                                 mEstates.add(estate);
-                                mShouldObserve = true;
+
 
                                 updateEstates();
 
@@ -298,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
             detailViewContainer.setVisibility(View.VISIBLE);
             if(!mEstates.isEmpty()) {
                 mBinding.noResultsTextView.setVisibility(View.GONE);
-                onRealEstateClickListener.OnRealEstateClick(0);
+           //     onRealEstateClickListener.OnRealEstateClick(0);
 
             } else {
                 mBinding.noResultsTextView.setVisibility(View.VISIBLE);
@@ -309,23 +302,19 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
         setContentView(mBinding.getRoot());
         SyncDB();
 
 
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        SyncDB();
-    }
 
 
     private void SyncDB() {
-        if (SaveRealEstateDB.isDatabasePrepopulated(this) && Utils.isInternetAvailable(this)) {
+        if (Utils.isInternetAvailable(this)) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
+            int totalEstates = mEstates.size();
+            int currentEstateIndex = 0;
             for (RealEstate estate : mEstates) {
                 if (!estate.getSync()) {
                     db.collection("estates").document(estate.getAgentName() + estate.getID()).set(estate.toHashMap())
@@ -335,6 +324,9 @@ public class MainActivity extends AppCompatActivity {
                                     estate.setSync(false);
                                 }
                             });
+                    currentEstateIndex++;
+                    if(currentEstateIndex == totalEstates)
+                        mShouldObserve = true;
 
                 }
             }

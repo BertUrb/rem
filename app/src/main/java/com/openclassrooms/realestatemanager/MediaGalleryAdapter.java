@@ -28,9 +28,13 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHo
     Context mContext;
     List<RealEstateMedia> mMediaList;
     MediaListItemBinding mBinding;
+    private OnItemClickListener mOnItemClickListener;
 
-    public MediaGalleryAdapter(List<RealEstateMedia> mediaList) {
+
+
+    public MediaGalleryAdapter(List<RealEstateMedia> mediaList,OnItemClickListener onItemClickListener) {
         mMediaList = mediaList;
+        mOnItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -38,7 +42,10 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHo
     public MediaGalleryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         mBinding = MediaListItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         mContext = parent.getContext();
-        return new MediaGalleryViewHolder(mBinding);
+        return new MediaGalleryViewHolder(mBinding,mOnItemClickListener);
+    }
+    public String getMediaUrl(int position) {
+        return mMediaList.get(position).getMediaUrl();
     }
 
     @Override
@@ -50,6 +57,10 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHo
         holder.getCaption().setText(mMediaList.get(position).getMediaCaption());
     }
 
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mOnItemClickListener = listener;
+    }
+
 
 
     @Override
@@ -57,3 +68,4 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHo
         return mMediaList.size();
     }
 }
+

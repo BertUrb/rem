@@ -2,6 +2,7 @@ package com.openclassrooms.realestatemanager.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
@@ -136,11 +137,11 @@ public class RealEstateMedia implements Parcelable {
         return medias;
     }
 
-    public HashMap<String, Object> toHashMap() {
+    public HashMap<String, Object> toHashMap(String agentName) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("mediaUrl", mFirestoreUrl);
         map.put("mediaCaption",mMediaCaption);
-        map.put("realEstateId",mRealEstateId);
+        map.put("realEstateId",agentName + mRealEstateId);
 
         return map;
 
@@ -154,6 +155,24 @@ public class RealEstateMedia implements Parcelable {
                 Objects.requireNonNull(document.getString("mediaCaption")));
 
         media.setSync(true);
+
+        return media;
+    }
+
+    public static RealEstateMedia fromQueryDocumentSnapshot(QueryDocumentSnapshot document,String agent) {
+
+        String idS = Objects.requireNonNull(document.getString("realEstateId")).substring(agent.length());
+
+        Log.d("TAG", "fromQueryDocumentSnapshot: " + idS);
+
+            int id = Integer.parseInt(idS);
+
+
+        RealEstateMedia media = new  RealEstateMedia(id,
+                Objects.requireNonNull(document.getString("mediaUrl")),
+                Objects.requireNonNull(document.getString("mediaCaption")));
+
+        media.setSync(false);
 
         return media;
     }

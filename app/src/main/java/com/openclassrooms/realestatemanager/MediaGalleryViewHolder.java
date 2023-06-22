@@ -10,9 +10,19 @@ import com.openclassrooms.realestatemanager.databinding.MediaListItemBinding;
 
 public class MediaGalleryViewHolder extends RecyclerView.ViewHolder {
     private final MediaListItemBinding mBinding;
-    public MediaGalleryViewHolder(@NonNull MediaListItemBinding binding) {
+
+    private final OnItemClickListener mOnItemClickListener;
+    public MediaGalleryViewHolder(@NonNull MediaListItemBinding binding,OnItemClickListener onItemClickListener) {
         super(binding.getRoot());
         mBinding = binding;
+        mOnItemClickListener = onItemClickListener;
+        mBinding.getRoot().setOnClickListener(v-> {
+            if (mOnItemClickListener != null) {
+                MediaGalleryAdapter adapter = (MediaGalleryAdapter) getBindingAdapter();
+
+                mOnItemClickListener.onItemClick(adapter.getMediaUrl(getBindingAdapterPosition()));
+            }
+        });
     }
 
     public ImageView getImage() {

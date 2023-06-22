@@ -1,6 +1,7 @@
 package com.openclassrooms.realestatemanager.ui;
 
 import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,11 +32,11 @@ import com.mapbox.search.SearchSelectionCallback;
 import com.mapbox.search.result.SearchResult;
 import com.mapbox.search.result.SearchSuggestion;
 import com.openclassrooms.realestatemanager.MediaGalleryAdapter;
+import com.openclassrooms.realestatemanager.OnItemClickListener;
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.SaveImageTask;
 import com.openclassrooms.realestatemanager.UploadImageToFirestore;
 import com.openclassrooms.realestatemanager.Utils;
-import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
 import com.openclassrooms.realestatemanager.databinding.ActivityDetailsBinding;
 import com.openclassrooms.realestatemanager.event.OnMapCreated;
 import com.openclassrooms.realestatemanager.injection.ViewModelFactory;
@@ -46,11 +47,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class DetailsFragment extends Fragment {
+public class DetailsFragment extends Fragment implements OnItemClickListener {
 
     private SearchEngine searchEngine;
     private Point mCenterPoint;
+    private ImagePopupWindow mImagePopupWindow;
 
     OnMapCreated mOnMapCreated = this::updateMap;
     RealEstate mEstate;
@@ -112,11 +115,11 @@ public class DetailsFragment extends Fragment {
     };
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mImagePopupWindow = new ImagePopupWindow();
     }
 
 
@@ -129,7 +132,7 @@ public class DetailsFragment extends Fragment {
         mEstate = bundle.getParcelable("REAL_ESTATE");
         mLiveData = mRealEstateViewModel.getRealEstateMediasByID(mEstate.getID());
         mObserver = this::mediaObserver;
-        mLiveData.observe(getViewLifecycleOwner(),mObserver);
+        mLiveData.observe(getViewLifecycleOwner(), mObserver);
         mBinding.address.setText(mEstate.getLocation());
         mBinding.description.setText(mEstate.getDescription());
         mBinding.surface.setText(getString(R.string.surface, mEstate.getSurface()));
@@ -159,7 +162,8 @@ public class DetailsFragment extends Fragment {
     private void mediaObserver(List<RealEstateMedia> mediaList) {
         mLiveData.removeObserver(mObserver);
         mEstate.setMediaList(mediaList);
-        MediaGalleryAdapter mediaGalleryAdapter = new MediaGalleryAdapter(mEstate.getMediaList());
+        MediaGalleryAdapter mediaGalleryAdapter = new MediaGalleryAdapter(mEstate.getMediaList(),this);
+
         mBinding.mediaGallery.setAdapter(mediaGalleryAdapter);
         mBinding.mediaGallery.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
@@ -182,40 +186,48 @@ public class DetailsFragment extends Fragment {
                         media.setFirestoreUrl(url);
 
 
-                        downloadFromFirestore(uploadImageToFirestore, size, media, finalI, url);
+                        downloadFromFirestore(uploadImageToFirestore, size, media, finalI, url, mEstate.getAgentName());
                     })));
 
 
                 } else {
-                    if(! (new File(media.getMediaUrl())).exists()) {
-                        downloadFromFirestore(uploadImageToFirestore, size, media, i, media.getFirestoreUrl());
-                    }
-                    if (i == 1) {
+                    if (!(new File(media.getMediaUrl())).exists()) {
+                        downloadFromFirestore(uploadImageToFirestore, size, media, i, media.getFirestoreUrl(), mEstate.getAgentName());
+                    } else if (i == 1) {
                         String oldUrl = mEstate.getFeaturedMediaUrl();
                         mEstate.setFeaturedMediaUrl(media.getMediaUrl());
                         mRealEstateViewModel.updateEstateFeaturedMediaUrl(oldUrl, media.getMediaUrl());
                     }
+                    else if (i == size)
+                        SyncDB();
                 }
 
             }
 
 
-       }
+        }
 
 
     }
 
-    private void downloadFromFirestore(UploadImageToFirestore uploadImageToFirestore, int size, RealEstateMedia media, int finalI, String url) {
+    private void downloadFromFirestore(UploadImageToFirestore uploadImageToFirestore, int size, RealEstateMedia media, int finalI, String url, String agentName) {
         try {
-            uploadImageToFirestore.downloadImage(url).observe(requireActivity(), localUrl -> {
-                media.setMediaURL(localUrl.getAbsolutePath());
+
+
+
+
+            uploadImageToFirestore.downloadImage(url).observe(requireActivity(), tempFile -> {
+
+                media.setMediaURL(tempFile.getAbsolutePath());
                 media.setSync(false);
                 mRealEstateViewModel.updateMedia(media);
-                Log.d("TAG", "SyncDB: ATTEMPT TO UPDATE " + mEstate.getAgentName() + media.getID() );
+                String name = mEstate.getAgentName() + media.getID();
+                Log.d("TAG", "SyncDB: ATTEMPT TO UPDATE " + name );
+
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 db.collection("medias")
-                        .document(mEstate.getAgentName() + media.getID())
-                        .set(media.toHashMap())
+                        .document( name)
+                        .set(media.toHashMap(agentName))
                         .addOnCompleteListener(mediaTask -> {
                             Log.d("TAG", "SyncDB: UPDATE OK ");
                             media.setSync(true);
@@ -229,7 +241,7 @@ public class DetailsFragment extends Fragment {
                 if (finalI == size) {
                     SyncDB();
                 }
-                Log.d("TAG", "onImageLoaded: UPDATED" + localUrl.getAbsolutePath());
+                Log.d("TAG", "onImageLoaded: UPDATED" + tempFile.getAbsolutePath());
 
             });
         } catch (IOException e) {
@@ -238,11 +250,16 @@ public class DetailsFragment extends Fragment {
     }
 
     private void SyncDB() {
-        if (Utils.isInternetAvailable(requireContext()) && SaveRealEstateDB.isDatabasePrepopulated(requireContext())) {
+        if (Utils.isInternetAvailable(requireContext())) {
+            if(mLiveData.hasActiveObservers())
+            {
+                mLiveData.removeObservers(getViewLifecycleOwner());
+            }
             Log.d("TAG", "SyncDB: PREPOPULATED " + mEstate);
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             if (mEstate != null) {
                 if (!mEstate.getSync()) {
+
 
                     Log.d("TAG", "SyncDB: " + mEstate.getAgentName() + mEstate.getID());
 
@@ -256,15 +273,38 @@ public class DetailsFragment extends Fragment {
                             });
                 }
 
+                int totalMediaCount = mEstate.getMediaList().size();
+                AtomicInteger completedMediaCount = new AtomicInteger();
 
 
+                for (RealEstateMedia media : mEstate.getMediaList()) {
+                    Log.d("TAG", "Before SyncMedia " + media.getMediaCaption());
+                    if (!media.getSync()) {
+                        Log.d("TAG", "SyncMedia " + media.getID());
+                        String name = mEstate.getAgentName() + media.getID();
+                        Log.d("TAG", "SyncMedia " + name);
+                        db.collection("medias").document( name)
+                                .set(media.toHashMap(mEstate.getAgentName())).addOnCompleteListener(t -> {
+                                    media.setSync(true);
+                                    Log.d("TAG", "SyncMedia : " + media.getMediaCaption() + "OK ?");
+                                    if (!t.isSuccessful()) {
+                                       media.setSync(false);
+                                        Log.d("TAG", "SyncMedia : " + media.getMediaCaption() + "KO");
+                                    }
+                                    completedMediaCount.getAndIncrement();
 
-
-
+                                    // Vérifier si tous les médias ont été synchronisés
+                                    if (completedMediaCount.get() == totalMediaCount && !mLiveData.hasActiveObservers()) {
+                                        mLiveData.observe(this, mObserver);
+                                        Log.d("TAG", "Tous les ajouts dans Firestore sont terminés.");
+                                    }
+                                });
+                    }
+                }
 
             }
         }
-        mLiveData.observe(getViewLifecycleOwner(), mObserver);
+        //mLiveData.observe(getViewLifecycleOwner(), mObserver);
     }
 
 
@@ -324,5 +364,11 @@ public class DetailsFragment extends Fragment {
 
 
         });
+    }
+
+    @Override
+    public void onItemClick(String url) {
+        mImagePopupWindow.showPopup(mBinding.getRoot(),url);
+
     }
 }
