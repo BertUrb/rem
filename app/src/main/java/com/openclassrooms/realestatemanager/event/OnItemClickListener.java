@@ -1,5 +1,7 @@
 package com.openclassrooms.realestatemanager.event;
 
+import com.openclassrooms.realestatemanager.model.RealEstateMedia;
+
 public interface OnItemClickListener {
-    void onItemClick(String url);
+    void onItemClick(RealEstateMedia media);
 }

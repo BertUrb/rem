@@ -22,7 +22,7 @@ public class MediaGalleryViewHolder extends RecyclerView.ViewHolder {
                 MediaGalleryAdapter adapter = (MediaGalleryAdapter) getBindingAdapter();
 
                 assert adapter != null;
-                mOnItemClickListener.onItemClick(adapter.getMediaUrl(getBindingAdapterPosition()));
+                mOnItemClickListener.onItemClick(adapter.getMedia(getBindingAdapterPosition()));
             }
         });
     }

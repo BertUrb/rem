@@ -35,9 +35,6 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHo
         mContext = parent.getContext();
         return new MediaGalleryViewHolder(mBinding,mOnItemClickListener);
     }
-    public String getMediaUrl(int position) {
-        return mMediaList.get(position).getMediaUrl();
-    }
 
     @Override
     public void onBindViewHolder(@NonNull MediaGalleryViewHolder holder, int position) {
@@ -52,6 +49,10 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryViewHo
     @Override
     public int getItemCount() {
         return mMediaList.size();
+    }
+
+    public RealEstateMedia getMedia(int bindingAdapterPosition) {
+        return  mMediaList.get(bindingAdapterPosition);
     }
 }
 

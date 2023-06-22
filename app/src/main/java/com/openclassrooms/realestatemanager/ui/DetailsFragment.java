@@ -365,8 +365,8 @@ public class DetailsFragment extends Fragment implements OnItemClickListener {
     }
 
     @Override
-    public void onItemClick(String url) {
-        mImagePopupWindow.showPopup(mBinding.getRoot(),url);
+    public void onItemClick(RealEstateMedia media) {
+        mImagePopupWindow.showPopup(mBinding.getRoot(),media);
 
     }
 }
