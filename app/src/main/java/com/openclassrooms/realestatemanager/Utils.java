@@ -4,7 +4,8 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 
-import java.text.DateFormat;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -40,8 +41,9 @@ public class Utils {
      */
     public static String getTodayDate() {
         Date today = new Date();
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
-        return dateFormat.format(today);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+        return formatter.format(today);
     }
 
     /**

@@ -19,4 +19,20 @@ public class UtilsInstrumentedTest {
     public void internet_should_be_available() {
         assertTrue(Utils.isInternetAvailable(InstrumentationRegistry.getInstrumentation().getTargetContext()));
     }
+
+    @Test
+    public void convertEuroToDollars() {
+        assertEquals(1000,Utils.convertEuroToDollars(812));
+    }
+
+    @Test
+    public void convertDollarToEuro() {
+        assertEquals(812,Utils.convertDollarToEuro(1000));
+    }
+
+    @Test
+    public void getTodayDate() {
+        assertEquals("27/06/2023",Utils.getTodayDate());
+    }
+
 }

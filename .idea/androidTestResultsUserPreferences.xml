@@ -81,6 +81,19 @@
             </AndroidTestResultsTableState>
           </value>
         </entry>
+        <entry key="-717053715">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="7_WSVGA_Tablet_API_33" value="120" />
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
         <entry key="-686804700">
           <value>
             <AndroidTestResultsTableState>
@@ -145,6 +158,19 @@
                   <entry key="Tests" value="360" />
                   <entry key="adb-RFCT70TN87X-Mwi2hQ._adb-tls-connect._tcp" value="120" />
                   <entry key="samsung&#10; SM-F936B" value="120" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="-129667384">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="7_WSVGA_Tablet_API_33" value="120" />
+                  <entry key="Duration" value="90" />
+                  <entry key="Tests" value="360" />
                 </map>
               </option>
             </AndroidTestResultsTableState>
