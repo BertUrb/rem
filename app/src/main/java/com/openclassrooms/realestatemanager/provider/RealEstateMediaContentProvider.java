@@ -11,13 +11,13 @@ import androidx.annotation.Nullable;
 
 import com.openclassrooms.realestatemanager.R;
 import com.openclassrooms.realestatemanager.database.SaveRealEstateDB;
-import com.openclassrooms.realestatemanager.model.RealEstate;
+import com.openclassrooms.realestatemanager.model.RealEstateMedia;
 
 public class RealEstateMediaContentProvider extends ContentProvider {
 
     public static final String AUTHORITY = "com.openclassrooms.realestatemanager.provider";
 
-    public static final String TABLE_NAME = RealEstate.class.getSimpleName();
+    public static final String TABLE_NAME = RealEstateMedia.class.getSimpleName();
     @Override
     public boolean onCreate() {
         return false;
@@ -30,7 +30,7 @@ public class RealEstateMediaContentProvider extends ContentProvider {
 
             long userId = ContentUris.parseId(uri);
 
-            final Cursor cursor = SaveRealEstateDB.getInstance(getContext()).realEstateDao().getRealEstateWithCursor(userId);
+            final Cursor cursor = SaveRealEstateDB.getInstance(getContext()).realEstateMediaDao().getMediaByRealEstateIdWithCursor(userId);
 
             cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
