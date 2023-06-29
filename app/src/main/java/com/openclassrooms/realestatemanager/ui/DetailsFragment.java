@@ -76,6 +76,8 @@ public class DetailsFragment extends Fragment implements OnItemClickListener {
                         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                             RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
                             mRealEstateViewModel.createOrUpdateRealEstate(editedEstate);
+                            mEstate.clone(editedEstate);
+                            updateUi();
                         }
                     });
 
@@ -148,6 +150,15 @@ public class DetailsFragment extends Fragment implements OnItemClickListener {
         mEstate = bundle.getParcelable("REAL_ESTATE");
 
 
+        updateUi();
+
+
+        return mBinding.getRoot();
+
+
+    }
+
+    private void updateUi() {
         mLiveData = mRealEstateViewModel.getRealEstateMediasByID(mEstate.getID());
         mObserver = this::mediaObserver;
         mLiveData.observe(getViewLifecycleOwner(), mObserver);
@@ -160,11 +171,6 @@ public class DetailsFragment extends Fragment implements OnItemClickListener {
         mBinding.agentTextView.setText(getString(R.string.agent, mEstate.getAgentName()));
 
         Log.d("TAG", "onCreateView: " + mEstate.toString());
-
-
-        return mBinding.getRoot();
-
-
     }
 
     private void updateMap(File file) {

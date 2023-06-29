@@ -380,6 +380,27 @@ public class RealEstate implements Parcelable {
         return realEstate;
 
     }
+    public void clone(RealEstate toClone){
+        mListingDate = toClone.getListingDate();
+        mBedrooms = toClone.getBedrooms();
+        mBathrooms = toClone.getBathrooms();
+        mDescription = toClone.getDescription();
+        mID = toClone.getID();
+        mSaleDate = toClone.getSaleDate();
+        mAgentName = toClone.getAgentName();
+        mFeaturedMediaUrl = toClone.getFeaturedMediaUrl();
+        mJsonPoint = toClone.getJsonPoint();
+        mLocation = toClone.getLocation();
+        mName = toClone.getName();
+        mListingDate = toClone.getListingDate();
+        mMediaList = toClone.getMediaList();
+        mPrice = toClone.getPrice();
+        mRegion = toClone.getRegion();
+        mSurface = toClone.getSurface();
+        mRooms = toClone.getRooms();
+
+
+    }
 
     public static RealEstate fromContentValues(ContentValues values) {
         final RealEstate estate = new RealEstate();

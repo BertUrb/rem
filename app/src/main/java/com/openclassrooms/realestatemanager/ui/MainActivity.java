@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
                         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                             RealEstate editedEstate = result.getData().getParcelableExtra("EDITED_REAL_ESTATE");
                             mRealEstateViewModel.createOrUpdateRealEstate(editedEstate);
+                            mEstate.clone(editedEstate);
+                            mEstates.get(mEstates.indexOf(editedEstate)).clone(editedEstate);
                         }
                     });
 
@@ -288,6 +290,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, SupportActivity.class);
                 intent.putExtra("REAL_ESTATE", mEstate);
                 startActivity(intent);
+                finish();
 
             }
 
