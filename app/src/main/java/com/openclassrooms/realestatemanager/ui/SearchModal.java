@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.InputType;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -60,6 +62,10 @@ public class SearchModal extends DialogFragment {
         LinearLayout dialogView = new LinearLayout(getActivity());
         dialogView.setOrientation(LinearLayout.VERTICAL);
         dialogView.setPadding(16, 16, 16, 16);
+
+        ScrollView scrollView = new ScrollView(getActivity());
+        scrollView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        scrollView.addView(dialogView);
 
         // Add a range seek bar to select the surface range
         TextView estateNameTextView = new TextView(getActivity());
@@ -169,7 +175,7 @@ public class SearchModal extends DialogFragment {
 
         // Set up the dialog window
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(), R.style.Theme_AppCompat_Light_Dialog_Alert);
-        builder.setView(dialogView);
+        builder.setView(scrollView);
         return builder.create();
     }
 
